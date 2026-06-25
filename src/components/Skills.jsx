@@ -148,7 +148,7 @@ export default function Skills() {
         const nodeMap = {}
         updatedNodes.forEach(n => { nodeMap[n.id] = n })
 
-        const k = 0.05 // link tension coefficient
+        const k = 0.015 // link tension coefficient (lower is more elastic/stretchy)
         const repulseStrength = 1500 // node repulsion charge
         const centerPull = 0.002 // center gravity
 
@@ -234,9 +234,9 @@ export default function Skills() {
           node.x += node.vx
           node.y += node.vy
 
-          // Friction damping
-          node.vx *= 0.76
-          node.vy *= 0.76
+          // Friction damping (higher keeps velocity longer for bouncy/wobbly motion)
+          node.vx *= 0.88
+          node.vy *= 0.88
 
           // Bound within viewport limits to prevent node & label text clipping
           const padX = isMobile ? 175 : 65
