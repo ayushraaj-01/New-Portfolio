@@ -30,12 +30,12 @@ const iconSpin = {
 }
 
 const certifications = [
-  { name: 'AWS Cloud Practitioner', issuer: 'Amazon Web Services', year: '2024' },
-  { name: 'Meta Front-End Developer', issuer: 'Meta (Coursera)', year: '2023' },
-  { name: 'Node.js Application Developer', issuer: 'OpenJS Foundation', year: '2023' },
-  { name: 'Docker Certified Associate', issuer: 'Docker, Inc.', year: '2024' },
-  { name: 'Google UX Design', issuer: 'Google (Coursera)', year: '2022' },
-  { name: 'MongoDB Associate Developer', issuer: 'MongoDB University', year: '2023' },
+  { name: 'InnoVault IIC DTU', issuer: 'Delhi Technological University (DTU)', year: '2026' },
+  { name: 'The Verdict MLNC', issuer: 'Motilal Nehru College, University of Delhi', year: '2025' },
+  { name: 'Daksh Sparkfest', issuer: 'GL Bajaj Institute of Technology & Management', year: '2025' },
+  { name: 'Hack4Health Hackathon', issuer: 'Indraprastha Institute of Information Technology, Delhi', year: '2025' },
+  { name: 'CodeMatrix: Genesis Hackathon', issuer: 'GDG DR AITD, Kanpur', year: '2025' },
+  { name: 'Protex: Hack-2-Win Hackathon', issuer: 'Protege, IGDTUW', year: '2024' },
 ]
 
 export default function Certifications() {
