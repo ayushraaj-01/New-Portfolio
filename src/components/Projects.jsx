@@ -50,24 +50,21 @@ export default function Projects() {
   const targetRef = useRef(null)
   const [maxTranslate, setMaxTranslate] = useState(0)
   const [viewportHeight, setViewportHeight] = useState(0)
-  const [isMobile, setIsMobile] = useState(false)
 
   useEffect(() => {
     const handleResize = () => {
-      const mobile = window.innerWidth <= 968
-      setIsMobile(mobile)
+      const vw = window.innerWidth
       setViewportHeight(window.innerHeight)
 
-      const isSmallMobile = window.innerWidth <= 600
-      const cardWidth = isSmallMobile ? 290 : (mobile ? 320 : 420)
-      const gap = isSmallMobile ? 16 : (mobile ? 20 : 32)
-      const padding = isSmallMobile ? 40 : (mobile ? 80 : 160) // total padding left + right
+      const isSmallMobile = vw <= 600
+      const isMobile = vw <= 968
+      const cardWidth = isSmallMobile ? 290 : (isMobile ? 320 : 420)
+      const gap = isSmallMobile ? 16 : (isMobile ? 20 : 32)
+      const padding = isSmallMobile ? 40 : (isMobile ? 80 : 160)
       const numCards = projects.length
       
       const trackWidth = numCards * cardWidth + (numCards - 1) * gap + padding
-      const viewportWidth = window.innerWidth
-      
-      setMaxTranslate(Math.max(0, trackWidth - viewportWidth))
+      setMaxTranslate(Math.max(0, trackWidth - vw))
     }
     
     handleResize()
@@ -75,45 +72,38 @@ export default function Projects() {
     return () => window.removeEventListener('resize', handleResize)
   }, [])
 
-  // Trackpad horizontal scroll mapper to vertical scroll on desktop
+  // Trackpad horizontal swipe → vertical scroll mapper (desktop only)
   useEffect(() => {
-    if (isMobile) return
-
     const element = targetRef.current
     if (!element) return
 
     const handleWheel = (e) => {
       if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) {
         e.preventDefault()
-        window.scrollBy({
-          top: e.deltaX,
-          behavior: 'auto'
-        })
+        window.scrollBy({ top: e.deltaX, behavior: 'auto' })
       }
     }
 
     element.addEventListener('wheel', handleWheel, { passive: false })
-    return () => {
-      element.removeEventListener('wheel', handleWheel)
-    }
-  }, [isMobile])
+    return () => element.removeEventListener('wheel', handleWheel)
+  }, [])
 
   const { scrollYProgress } = useScroll({
     target: targetRef,
   })
 
-  // Horizontal translation in pixels with smooth spring physics
-  const x = useTransform(scrollYProgress, [0, 1], [0, -maxTranslate])
-  const smoothX = useSpring(x, { stiffness: 120, damping: 24, restDelta: 0.001 })
+  // Map vertical scroll progress to horizontal pixel translation
+  const x = useTransform(scrollYProgress, [0.05, 0.95], [0, -maxTranslate])
+  const smoothX = useSpring(x, { stiffness: 150, damping: 28, restDelta: 0.5 })
 
   // Mouse-follow glow on project cards
   const handleMouseMove = useCallback((e) => {
     const card = e.currentTarget
     const rect = card.getBoundingClientRect()
-    const x = ((e.clientX - rect.left) / rect.width) * 100
-    const y = ((e.clientY - rect.top) / rect.height) * 100
-    card.style.setProperty('--mouse-x', `${x}%`)
-    card.style.setProperty('--mouse-y', `${y}%`)
+    const mx = ((e.clientX - rect.left) / rect.width) * 100
+    const my = ((e.clientY - rect.top) / rect.height) * 100
+    card.style.setProperty('--mouse-x', `${mx}%`)
+    card.style.setProperty('--mouse-y', `${my}%`)
   }, [])
 
   return (
@@ -121,7 +111,7 @@ export default function Projects() {
       ref={targetRef} 
       className="projects-sticky-section" 
       id="projects"
-      style={{ height: isMobile ? 'auto' : `${viewportHeight + maxTranslate}px` }}
+      style={{ height: `${viewportHeight + maxTranslate}px` }}
     >
       <div className="projects-sticky-wrapper">
         <div className="projects-header-container">
@@ -130,7 +120,7 @@ export default function Projects() {
 
         <motion.div 
           className="projects-horizontal-track" 
-          style={{ x: isMobile ? 0 : smoothX }}
+          style={{ x: smoothX }}
         >
 
           {/* Project Items */}

@@ -33,8 +33,21 @@ const staggerContainer = {
   visible: { transition: { staggerChildren: 0.2, delayChildren: 0.1 } },
 }
 
-const contactLinks = [
+const desktopContactLinks = [
   { icon: <FiMail />, label: 'ayushr94150@gmail.com', href: 'mailto:ayushr94150@gmail.com' },
+  { icon: <FiGithub />, label: 'ayushraaj-01', href: 'https://github.com/ayushraaj-01' },
+  { icon: <FiLinkedin />, label: 'ayush-raj-3849a1335', href: 'https://linkedin.com/in/ayush-raj-3849a1335/' },
+  { icon: <FaXTwitter />, label: '@AyushRa80083799', href: 'https://x.com/AyushRa80083799' },
+]
+
+const mobileContactLinks = [
+  { icon: <FiMail />, label: 'ayushr94150@gmail.com', href: 'mailto:ayushr94150@gmail.com' },
+]
+
+const mobileSocialLinks = [
+  { icon: <FiGithub />, href: 'https://github.com/ayushraaj-01', label: 'GitHub' },
+  { icon: <FiLinkedin />, href: 'https://linkedin.com/in/ayush-raj-3849a1335/', label: 'LinkedIn' },
+  { icon: <FaXTwitter />, href: 'https://x.com/AyushRa80083799', label: 'X (formerly Twitter)' },
 ]
 
 export default function Contact() {
@@ -112,8 +125,9 @@ export default function Contact() {
                 hello — don't hesitate to reach out!
               </p>
             </RevealOnScroll>
-            <div className="contact-links">
-              {contactLinks.map((link, i) => (
+            {/* Desktop Contact Links */}
+            <div className="contact-links contact-links-desktop">
+              {desktopContactLinks.map((link, i) => (
                 <motion.a
                   key={i}
                   href={link.href}
@@ -121,9 +135,6 @@ export default function Contact() {
                   target="_blank"
                   rel="noopener noreferrer"
                   custom={i}
-                  initial="hidden"
-                  whileInView="visible"
-                  viewport={{ once: true }}
                   variants={linkItemVariants}
                   whileHover={{ x: 10, scale: 1.02, transition: { duration: 0.25 } }}
                 >
@@ -131,6 +142,44 @@ export default function Contact() {
                   <span>{link.label}</span>
                 </motion.a>
               ))}
+            </div>
+
+            {/* Mobile Contact Links */}
+            <div className="contact-links contact-links-mobile">
+              {mobileContactLinks.map((link, i) => (
+                <motion.a
+                  key={i}
+                  href={link.href}
+                  className="contact-link-item"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  custom={i}
+                  variants={linkItemVariants}
+                  whileHover={{ x: 10, scale: 1.02, transition: { duration: 0.25 } }}
+                >
+                  <div className="icon">{link.icon}</div>
+                  <span>{link.label}</span>
+                </motion.a>
+              ))}
+
+              <div className="contact-socials-row">
+                {mobileSocialLinks.map((social, i) => (
+                  <motion.a
+                    key={i}
+                    href={social.href}
+                    className="contact-social-btn"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={social.label}
+                    custom={i + 1}
+                    variants={linkItemVariants}
+                    whileHover={{ scale: 1.1, y: -3 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    {social.icon}
+                  </motion.a>
+                ))}
+              </div>
             </div>
           </motion.div>
 

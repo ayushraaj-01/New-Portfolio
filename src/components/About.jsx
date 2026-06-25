@@ -88,7 +88,7 @@ export default function About() {
                 </span>
                 <span className="meta-dot">•</span>
                 <span className="meta-item">
-                  <LuGraduationCap className="meta-icon" /> ABES Engineering College — B.Tech CSE (AI & ML)
+                  <LuGraduationCap className="meta-icon" /> ABES Engineering College — B.Tech CSE
                 </span>
                 <span className="meta-dot">•</span>
                 <span className="meta-item">

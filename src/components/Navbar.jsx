@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { FiSun, FiMoon } from 'react-icons/fi'
+import { FiSun, FiMoon, FiHome, FiUser, FiFolder, FiAward, FiMail } from 'react-icons/fi'
 
 const navItems = [
   { label: 'About', href: '#about' },
@@ -9,9 +9,16 @@ const navItems = [
   { label: 'Contact', href: '#contact' },
 ]
 
+const mobileNavItems = [
+  { label: 'Home', href: '#hero', icon: FiHome },
+  { label: 'About', href: '#about', icon: FiUser },
+  { label: 'Projects', href: '#projects', icon: FiFolder },
+  { label: 'Certs', href: '#certifications', icon: FiAward },
+  { label: 'Contact', href: '#contact', icon: FiMail },
+]
+
 export default function Navbar({ theme, toggleTheme }) {
   const [scrolled, setScrolled] = useState(false)
-  const [mobileOpen, setMobileOpen] = useState(false)
   const [activeSection, setActiveSection] = useState('')
 
   useEffect(() => {
@@ -33,7 +40,6 @@ export default function Navbar({ theme, toggleTheme }) {
 
   const handleNavClick = (e, href) => {
     e.preventDefault()
-    setMobileOpen(false)
     const el = document.querySelector(href)
     if (el) el.scrollIntoView({ behavior: 'smooth' })
   }
@@ -43,6 +49,8 @@ export default function Navbar({ theme, toggleTheme }) {
       <a href="#" className="brand-monogram" onClick={e => handleNavClick(e, '#hero')} aria-label="Home">
         ayush<span className="accent">.</span>dev
       </a>
+
+      {/* Desktop top navbar */}
       <nav className={`navbar ${scrolled ? 'scrolled' : ''}`} id="navbar">
         <div className="navbar-inner">
           <a href="#" className="nav-logo" onClick={e => handleNavClick(e, '#hero')} aria-label="Home">
@@ -74,31 +82,36 @@ export default function Navbar({ theme, toggleTheme }) {
             >
               {theme === 'dark' ? <FiSun /> : <FiMoon />}
             </button>
-            <button
-              className={`mobile-toggle ${mobileOpen ? 'open' : ''}`}
-              onClick={() => setMobileOpen(!mobileOpen)}
-              aria-label="Toggle menu"
-              id="mobile-menu-toggle"
-            >
-              <span />
-              <span />
-              <span />
-            </button>
           </div>
         </div>
       </nav>
 
-      <div className={`mobile-nav ${mobileOpen ? 'open' : ''}`}>
-        {navItems.map(item => (
-          <a
-            key={item.href}
-            href={item.href}
-            onClick={e => handleNavClick(e, item.href)}
-          >
-            {item.label}
-          </a>
-        ))}
-      </div>
+      {/* Mobile bottom icon navbar */}
+      <nav className="mobile-bottom-nav" aria-label="Mobile navigation">
+        {mobileNavItems.map(item => {
+          const Icon = item.icon
+          const isActive = activeSection === item.href.slice(1) || 
+            (item.href === '#hero' && !activeSection)
+          return (
+            <a
+              key={item.href}
+              href={item.href}
+              className={`mobile-bottom-nav-item ${isActive ? 'active' : ''}`}
+              onClick={e => handleNavClick(e, item.href)}
+              aria-label={item.label}
+            >
+              <Icon />
+            </a>
+          )
+        })}
+        <button
+          className="mobile-bottom-nav-item theme-toggle-mobile"
+          onClick={toggleTheme}
+          aria-label="Toggle theme"
+        >
+          {theme === 'dark' ? <FiSun /> : <FiMoon />}
+        </button>
+      </nav>
     </>
   )
 }
