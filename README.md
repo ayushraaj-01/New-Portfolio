@@ -1,16 +1,94 @@
-# React + Vite
+# 🚀 Ayush Raj | Developer Portfolio
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+Welcome to my personal portfolio website! This portfolio showcases my projects, skills, achievements, and journey as a Computer Science Engineering student passionate about building impactful software and exploring new technologies.
 
-Currently, two official plugins are available:
+## 🌐 Live Demo
+🔗 [Visit Portfolio](https://your-portfolio-link.vercel.app)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## 📸 Preview
+![Portfolio Preview](./assets/preview.png)
 
-## React Compiler
+---
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## 👨‍💻 About Me
 
-## Expanding the Oxlint configuration
+Hi, I'm **Ayush Raj**, a 3rd-year Computer Science Engineering student with a strong interest in:
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and Oxlint's TypeScript related rules in your project.
+- 💻 Full-Stack Web Development
+- 🌟 Open Source Contributions
+- 🧩 Data Structures & Algorithms
+- 🚀 Building Real-World Projects
+- 📚 Continuous Learning and Problem Solving
+
+---
+
+## ✨ Features
+
+- Responsive Design 📱
+- Modern and Clean UI 🎨
+- Smooth Animations ⚡
+- Projects Showcase 🛠️
+- Skills Section 💡
+- Contact Form 📩
+- Social Media Links 🔗
+
+---
+
+## 🛠️ Tech Stack
+
+**Frontend**
+- HTML5
+- CSS3
+- JavaScript
+
+**Tools & Technologies**
+- Git
+- GitHub
+- VS Code
+- Vercel
+
+---
+
+## 📂 Project Structure
+
+```bash
+New-Portfolio/
+├── assets/
+├── css/
+├── js/
+├── images/
+├── index.html
+└── README.md
+```
+
+---
+
+## 🚀 Getting Started
+
+### Clone the repository
+
+```bash
+git clone https://github.com/ayushraaj-01/New-Portfolio.git
+```
+
+### Navigate to the project
+
+```bash
+cd New-Portfolio
+```
+
+### Run locally
+
+Simply open `index.html` in your browser.
+
+---
+
+## 📬 Connect With Me
+
+- GitHub: https://github.com/ayushraaj-01
+- LinkedIn: https://linkedin.com/in/your-linkedin
+- Email: your-email@example.com
+
+---
+
+⭐ If you like this project, don't forget to star the repository!
