@@ -40,10 +40,15 @@ export default function Navbar({ theme, toggleTheme }) {
 
   return (
     <>
+      <a href="#" className="brand-monogram" onClick={e => handleNavClick(e, '#hero')} aria-label="Home">
+        ayush<span className="accent">.</span>dev
+      </a>
       <nav className={`navbar ${scrolled ? 'scrolled' : ''}`} id="navbar">
         <div className="navbar-inner">
-          <a href="#" className="nav-logo">
-            ayush<span className="accent">.</span>dev
+          <a href="#" className="nav-logo" onClick={e => handleNavClick(e, '#hero')} aria-label="Home">
+            <div className="nav-logo-badge">
+              <img src="/fcb_bw.svg" alt="FC Barcelona" className="fcb-logo" />
+            </div>
           </a>
 
           <ul className="nav-links">
