@@ -147,7 +147,7 @@ export default function Contact() {
               <input
                 type="text"
                 id="contact-name"
-                placeholder="Your name"
+                placeholder="e.g. John Doe"
                 required
                 value={formData.name}
                 onChange={e => setFormData({ ...formData, name: e.target.value })}
@@ -157,7 +157,7 @@ export default function Contact() {
               <input
                 type="email"
                 id="contact-email"
-                placeholder="Your email"
+                placeholder="e.g. john@example.com"
                 required
                 value={formData.email}
                 onChange={e => setFormData({ ...formData, email: e.target.value })}
@@ -166,7 +166,7 @@ export default function Contact() {
             <div className="form-group">
               <textarea
                 id="contact-message"
-                placeholder="Your message"
+                placeholder="Hi Ayush, I'd love to work with you on..."
                 required
                 value={formData.message}
                 onChange={e => setFormData({ ...formData, message: e.target.value })}
