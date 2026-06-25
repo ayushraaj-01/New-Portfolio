@@ -81,6 +81,14 @@ export default function Skills() {
   const [draggedNode, setDraggedNode] = useState(null)
   const dragOffset = useRef({ x: 0, y: 0 })
   const requestRef = useRef(null)
+  const [isMobile, setIsMobile] = useState(false)
+
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth <= 768)
+    checkMobile()
+    window.addEventListener('resize', checkMobile)
+    return () => window.removeEventListener('resize', checkMobile)
+  }, [])
 
   const width = 900
   const height = 500
@@ -231,9 +239,9 @@ export default function Skills() {
           node.vy *= 0.76
 
           // Bound within viewport limits to prevent node & label text clipping
-          const padX = 65
-          const padTop = 40
-          const padBottom = 55
+          const padX = isMobile ? 175 : 65
+          const padTop = isMobile ? 50 : 40
+          const padBottom = isMobile ? 75 : 55
           if (node.x < padX) { node.x = padX; node.vx *= -0.5 }
           if (node.x > width - padX) { node.x = width - padX; node.vx *= -0.5 }
           if (node.y < padTop) { node.y = padTop; node.vy *= -0.5 }
@@ -294,9 +302,9 @@ export default function Skills() {
     setNodes((currentNodes) =>
       currentNodes.map((node) => {
         if (node.id === draggedNode) {
-          const padX = 65
-          const padTop = 40
-          const padBottom = 55
+          const padX = isMobile ? 175 : 65
+          const padTop = isMobile ? 50 : 40
+          const padBottom = isMobile ? 75 : 55
           return {
             ...node,
             x: Math.max(padX, Math.min(width - padX, mouseX - dragOffset.current.x)),
@@ -338,7 +346,7 @@ export default function Skills() {
         <AnimatedSectionHeader label="Skills" title="My tech stack" />
 
         <motion.div className="skills-graph-container" style={{ y }} ref={containerRef}>
-          <svg className="skills-graph-svg" viewBox="0 0 900 500">
+          <svg className="skills-graph-svg" viewBox={isMobile ? "140 20 620 460" : "0 0 900 500"}>
             <defs>
               <pattern id="grid" width="30" height="30" patternUnits="userSpaceOnUse">
                 <path d="M 30 0 L 0 0 0 30" fill="none" stroke="rgba(255, 255, 255, 0.02)" strokeWidth="1" />
@@ -404,10 +412,10 @@ export default function Skills() {
                 />
                 {/* Text Label */}
                 <text
-                  y={node.size + 15}
+                  y={node.size + (isMobile ? 17 : 15)}
                   textAnchor="middle"
                   fill={node.isCore ? 'var(--text-primary)' : 'var(--text-secondary)'}
-                  fontSize={node.isCore ? '10.5px' : '9.5px'}
+                  fontSize={node.isCore ? (isMobile ? '12px' : '10.5px') : (isMobile ? '11px' : '9.5px')}
                   fontFamily="var(--font-display)"
                   fontWeight={node.isCore ? '700' : '500'}
                   style={{ userSelect: 'none', pointerEvents: 'none' }}
