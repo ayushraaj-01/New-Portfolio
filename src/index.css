@@ -886,8 +886,6 @@ section {
 /* ===== HORIZONTAL STICKY PROJECTS SECTION ===== */
 .projects-sticky-section {
   position: relative;
-  height: 250vh;
-  /* Adjust for scroll length */
   background: var(--bg-primary);
 }
 
@@ -1367,37 +1365,44 @@ section {
   }
 
   .projects-sticky-section {
-    height: 250vh !important;
+    height: auto !important;
   }
 
   .projects-sticky-wrapper {
-    position: sticky !important;
-    top: 0 !important;
-    height: 100vh !important;
-    overflow: hidden !important;
-    display: flex !important;
-    align-items: flex-end !important;
-    padding-bottom: 8vh !important;
+    position: relative !important;
+    top: auto !important;
+    height: auto !important;
+    overflow: visible !important;
+    display: block !important;
+    padding-bottom: 0 !important;
   }
 
   .projects-horizontal-track {
     display: flex !important;
     flex-direction: row !important;
-    padding: 0 40px !important;
+    padding: 10px 40px 30px !important;
     gap: 20px !important;
-    transform: none;
+    overflow-x: auto !important;
+    scroll-snap-type: x mandatory !important;
+    -webkit-overflow-scrolling: touch !important;
+    scrollbar-width: none; /* Firefox */
+  }
+
+  .projects-horizontal-track::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Opera */
   }
 
   .projects-header-container {
-    position: absolute !important;
-    top: 40px !important;
-    left: 0 !important;
-    right: 0 !important;
+    position: relative !important;
+    top: auto !important;
+    margin-bottom: 30px !important;
+    padding: 0 40px !important;
     z-index: 5 !important;
-    pointer-events: none !important;
+    pointer-events: auto !important;
   }
 
   .project-card {
+    scroll-snap-align: center !important;
     width: 320px !important;
     height: 420px !important;
   }
@@ -1460,8 +1465,12 @@ section {
   }
 
   .projects-horizontal-track {
-    padding: 0 20px !important;
+    padding: 10px 20px 30px !important;
     gap: 16px !important;
+  }
+
+  .projects-header-container {
+    padding: 0 20px !important;
   }
 
   .project-card {
