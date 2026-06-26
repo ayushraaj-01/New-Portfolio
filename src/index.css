@@ -1925,3 +1925,62 @@ section {
     height: 440px;
   }
 }
+
+/* ===== LIGHTBULB TOGGLE STYLES & ANIMATIONS ===== */
+.lightbulb-svg {
+  width: 22px;
+  height: 22px;
+  display: block;
+  overflow: visible;
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  color: var(--text-secondary);
+}
+
+.theme-toggle:hover .lightbulb-svg,
+.theme-toggle-mobile:hover .lightbulb-svg {
+  transform: scale(1.1) rotate(5deg);
+  color: var(--accent);
+}
+
+/* Filament and rays paths */
+.lightbulb-filament,
+.lightbulb-rays path {
+  stroke-dasharray: 1.1;
+  stroke-dashoffset: 0;
+  opacity: 1;
+  transition: stroke-dashoffset 0.45s cubic-bezier(0.4, 0, 0.2, 1), 
+              opacity 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Hide filament and rays in dark mode (bulb off) */
+[data-theme="dark"] .lightbulb-filament,
+[data-theme="dark"] .lightbulb-rays path {
+  stroke-dashoffset: 1;
+  opacity: 0;
+}
+
+/* Specific stroke widths to override general SVG overrides */
+.lightbulb-svg {
+  stroke-width: 0.7 !important;
+}
+
+.lightbulb-filament {
+  stroke-width: 0.7 !important;
+}
+
+.lightbulb-rays path {
+  stroke-width: 1.5 !important;
+}
+
+/* Make the lit lightbulb glow yellow when in light mode */
+[data-theme="light"] .theme-toggle,
+[data-theme="light"] .theme-toggle-mobile {
+  color: #ffb000 !important; /* Warm lightbulb glow yellow */
+}
+
+/* Add drop-shadow glow to the lightbulb in light mode */
+[data-theme="light"] .theme-toggle .lightbulb-svg,
+[data-theme="light"] .theme-toggle-mobile .lightbulb-svg {
+  color: #ffb000 !important;
+  filter: drop-shadow(0 0 5px rgba(255, 176, 0, 0.6));
+}
