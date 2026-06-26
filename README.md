@@ -3,7 +3,7 @@
 Welcome to my personal portfolio website! This portfolio showcases my projects, skills, achievements, and journey as a Computer Science Engineering student passionate about building impactful software and exploring new technologies.
 
 ## 🌐 Live Demo
-🔗 [Visit Portfolio]([https://your-portfolio-link.vercel.app](https://new-portfolio-woad-chi-25.vercel.app/))
+🔗 [Visit Portfolio](https://new-portfolio-woad-chi-25.vercel.app/)
 
 ---
 
@@ -37,6 +37,12 @@ Hi, I'm **Ayush Raj**, a 3rd-year Computer Science Engineering student with a st
 - HTML5
 - CSS3
 - JavaScript
+
+- **Backend**
+- Node.js
+- express
+- jwt
+- socket.io
 
 **Tools & Technologies**
 - Git
