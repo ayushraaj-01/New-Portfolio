@@ -3,7 +3,7 @@
 Welcome to my personal portfolio website! This portfolio showcases my projects, skills, achievements, and journey as a Computer Science Engineering student passionate about building impactful software and exploring new technologies.
 
 ## 🌐 Live Demo
-🔗 [Visit Portfolio](https://your-portfolio-link.vercel.app)
+🔗 [Visit Portfolio]([https://your-portfolio-link.vercel.app](https://new-portfolio-woad-chi-25.vercel.app/))
 
 ---
 
@@ -83,8 +83,8 @@ Simply open `index.html` in your browser.
 ## 📬 Connect With Me
 
 - GitHub: https://github.com/ayushraaj-01
-- LinkedIn: https://linkedin.com/in/your-linkedin
-- Email: your-email@example.com
+- LinkedIn:[ https://linkedin.com/in/your-linkedin](https://www.linkedin.com/in/ayush-raj-3849a1335/?skipRedirect=true)
+- Email: your-ayushr94150@gmail.com
 
 ---
 
