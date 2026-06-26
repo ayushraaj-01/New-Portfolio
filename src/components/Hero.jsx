@@ -229,7 +229,7 @@ export default function Hero() {
             View Projects <FiArrowRight />
           </motion.a>
           <motion.a
-            href="https://drive.google.com/file/d/1cHMetAEPy6CmXu-4olhC-7XlvYuDFGCv/view"
+            href="https://drive.google.com/file/d/1cHMetAEPy6CmXu-4olhC-7XlvYuDFGCv/view?usp=sharing"
             className="btn btn-secondary"
             target="_blank"
             rel="noopener noreferrer"

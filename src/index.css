@@ -298,7 +298,10 @@ section {
 
 @media (max-width: 850px) {
   .brand-monogram {
-    display: none;
+    top: 20px;
+    left: 24px;
+    transform: none;
+    font-size: 1.15rem;
   }
 }
 
@@ -1480,6 +1483,14 @@ section {
   .contact-links-mobile {
     display: flex !important;
     flex-direction: column;
+  }
+
+  .footer {
+    padding-bottom: 96px;
+  }
+
+  .footer-socials {
+    display: none !important;
   }
 
   .footer-content {

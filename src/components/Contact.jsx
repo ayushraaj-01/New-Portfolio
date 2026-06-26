@@ -35,9 +35,6 @@ const staggerContainer = {
 
 const desktopContactLinks = [
   { icon: <FiMail />, label: 'ayushr94150@gmail.com', href: 'mailto:ayushr94150@gmail.com' },
-  { icon: <FiGithub />, label: 'ayushraaj-01', href: 'https://github.com/ayushraaj-01' },
-  { icon: <FiLinkedin />, label: 'ayush-raj-3849a1335', href: 'https://linkedin.com/in/ayush-raj-3849a1335/' },
-  { icon: <FaXTwitter />, label: '@AyushRa80083799', href: 'https://x.com/AyushRa80083799' },
 ]
 
 const mobileContactLinks = [
