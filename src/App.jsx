@@ -14,11 +14,39 @@ import { SectionDivider } from './components/animations'
 const sections = ['hero', 'about', 'skills', 'projects', 'certifications', 'contact']
 
 function App() {
-  const [theme, setTheme] = useState('dark')
+  const [theme, setTheme] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('portfolio-theme') || 'dark'
+    }
+    return 'dark'
+  })
   const [activeSection, setActiveSection] = useState('hero')
+  const [showSurprise, setShowSurprise] = useState(false)
+
+  // Keyboard sequence listener for "rick"
+  useEffect(() => {
+    let inputSequence = ''
+    const targetSequence = 'rick'
+
+    const handleKeyDown = (e) => {
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return
+      inputSequence = (inputSequence + e.key.toLowerCase()).slice(-4)
+      if (inputSequence === targetSequence) {
+        setShowSurprise(true)
+        inputSequence = '' // Reset sequence
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [])
 
   const toggleTheme = () => {
-    setTheme(prev => prev === 'dark' ? 'light' : 'dark')
+    setTheme(prev => {
+      const next = prev === 'dark' ? 'light' : 'dark'
+      localStorage.setItem('portfolio-theme', next)
+      return next
+    })
   }
 
   useEffect(() => {
@@ -128,10 +156,37 @@ function App() {
         <Certifications />
 
         <SectionDivider />
-        <Contact />
+        <Contact onTriggerSurprise={() => setShowSurprise(true)} />
       </main>
 
-      <Footer />
+      <Footer onTriggerSurprise={() => setShowSurprise(true)} />
+
+      {showSurprise && (
+        <div className="surprise-modal-overlay" onClick={() => setShowSurprise(false)}>
+          <div className="surprise-modal-content" onClick={(e) => e.stopPropagation()}>
+            <button className="surprise-close-btn" onClick={() => setShowSurprise(false)} aria-label="Close modal">
+              &times;
+            </button>
+            <div className="surprise-header-emoji">🎉</div>
+            <h3 className="surprise-modal-title">Secret Easter Egg Unlocked!</h3>
+            <p className="surprise-modal-message">
+              Congratulations! You found a hidden gem in Ayush's portfolio. Enjoy this legendary tune! 🕺✨
+            </p>
+            <div className="video-responsive">
+              <iframe
+                src="https://www.youtube.com/embed/wZMue5I8qn8?autoplay=1&mute=0"
+                title="Surprise Video"
+                frameBorder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+              ></iframe>
+            </div>
+            <button className="surprise-ok-btn" onClick={() => setShowSurprise(false)}>
+              Close & Keep Grooving
+            </button>
+          </div>
+        </div>
+      )}
     </>
   )
 }

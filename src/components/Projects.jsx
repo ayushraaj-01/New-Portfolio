@@ -63,8 +63,10 @@ export default function Projects() {
       const padding = isSmallMobile ? 40 : (isMobile ? 80 : 160)
       const numCards = projects.length
       
-      const trackWidth = numCards * cardWidth + (numCards - 1) * gap + padding
-      setMaxTranslate(Math.max(0, trackWidth - vw))
+      const leftOfLastCard = (padding / 2) + (numCards - 1) * (cardWidth + gap)
+      const centerOfLastCard = leftOfLastCard + cardWidth / 2
+      const targetTranslate = centerOfLastCard - vw / 2
+      setMaxTranslate(Math.max(0, targetTranslate))
     }
     
     handleResize()

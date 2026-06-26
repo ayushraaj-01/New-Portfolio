@@ -1,10 +1,11 @@
 import { useEffect, useState, useRef } from 'react'
 
 export default function CursorDot() {
-  const dotRef = useRef(null)
-  const ringRef = useRef(null)
+  const catRef = useRef(null)
   const [hovering, setHovering] = useState(false)
+  const [clicked, setClicked] = useState(false)
   const [visible, setVisible] = useState(false)
+  const [ripples, setRipples] = useState([])
 
   useEffect(() => {
     // Only show cursor on non-touch devices
@@ -12,16 +13,15 @@ export default function CursorDot() {
     if (isTouch) return
 
     const pos = { x: 0, y: 0 }
-    const ring = { x: 0, y: 0 }
 
     const onMouseMove = (e) => {
       pos.x = e.clientX
       pos.y = e.clientY
       if (!visible) setVisible(true)
 
-      if (dotRef.current) {
-        dotRef.current.style.left = `${pos.x - 4}px`
-        dotRef.current.style.top = `${pos.y - 4}px`
+      if (catRef.current) {
+        catRef.current.style.left = `${pos.x}px`
+        catRef.current.style.top = `${pos.y}px`
       }
     }
 
@@ -33,7 +33,9 @@ export default function CursorDot() {
         target.closest('a') ||
         target.closest('button') ||
         target.classList.contains('skill-chip') ||
-        target.classList.contains('project-card')
+        target.classList.contains('project-card') ||
+        target.closest('.skill-chip') ||
+        target.closest('.project-card')
       ) {
         setHovering(true)
       } else {
@@ -41,31 +43,45 @@ export default function CursorDot() {
       }
     }
 
+    const onMouseDown = (e) => {
+      setClicked(true)
+      const newRipple = {
+        id: Math.random().toString(36).substring(2, 9),
+        x: e.clientX,
+        y: e.clientY
+      }
+      setRipples(prev => [...prev, newRipple])
+      setTimeout(() => {
+        setRipples(prev => prev.filter(r => r.id !== newRipple.id))
+      }, 600)
+    }
+
+    const onMouseUp = () => {
+      setClicked(false)
+    }
+
     const onMouseLeave = () => {
       setVisible(false)
     }
 
-    let animFrame
-    const animate = () => {
-      ring.x += (pos.x - ring.x) * 0.15
-      ring.y += (pos.y - ring.y) * 0.15
-      if (ringRef.current) {
-        ringRef.current.style.left = `${ring.x - 18}px`
-        ringRef.current.style.top = `${ring.y - 18}px`
-      }
-      animFrame = requestAnimationFrame(animate)
+    const onMouseEnter = () => {
+      setVisible(true)
     }
 
     window.addEventListener('mousemove', onMouseMove)
     window.addEventListener('mouseover', onMouseOver)
+    window.addEventListener('mousedown', onMouseDown)
+    window.addEventListener('mouseup', onMouseUp)
     document.addEventListener('mouseleave', onMouseLeave)
-    animFrame = requestAnimationFrame(animate)
+    document.addEventListener('mouseenter', onMouseEnter)
 
     return () => {
       window.removeEventListener('mousemove', onMouseMove)
       window.removeEventListener('mouseover', onMouseOver)
+      window.removeEventListener('mousedown', onMouseDown)
+      window.removeEventListener('mouseup', onMouseUp)
       document.removeEventListener('mouseleave', onMouseLeave)
-      cancelAnimationFrame(animFrame)
+      document.removeEventListener('mouseenter', onMouseEnter)
     }
   }, [visible])
 
@@ -73,18 +89,31 @@ export default function CursorDot() {
     return null
   }
 
+  const isOpen = hovering || clicked
+
   return (
     <>
       <div
-        ref={dotRef}
-        className={`cursor-dot ${hovering ? 'hovering' : ''}`}
+        ref={catRef}
+        className={`popcat-cursor ${isOpen ? 'open' : 'closed'}`}
         style={{ opacity: visible ? 1 : 0 }}
-      />
-      <div
-        ref={ringRef}
-        className={`cursor-ring ${hovering ? 'hovering' : ''}`}
-        style={{ opacity: visible ? 1 : 0 }}
-      />
+      >
+        <img
+          src={isOpen ? '/popcat2.png' : '/popcat1.png'}
+          alt="Popcat Cursor"
+        />
+      </div>
+      {ripples.map(ripple => (
+        <div
+          key={ripple.id}
+          className="pop-ripple"
+          style={{
+            left: `${ripple.x}px`,
+            top: `${ripple.y}px`,
+          }}
+        />
+      ))}
     </>
   )
 }
+

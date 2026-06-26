@@ -1,7 +1,7 @@
 import { FiGithub, FiLinkedin } from 'react-icons/fi'
 import { FaXTwitter } from 'react-icons/fa6'
 
-export default function Footer() {
+export default function Footer({ onTriggerSurprise }) {
   const year = new Date().getFullYear()
 
   return (
@@ -21,6 +21,14 @@ export default function Footer() {
             >
               <FiGithub />
             </a>
+            <button
+              onClick={onTriggerSurprise}
+              className="footer-social-link footer-surprise-btn"
+              title="Surprise"
+              aria-label="Surprise Link"
+            >
+              🪐
+            </button>
             <a
               href="https://linkedin.com/in/ayush-raj-3849a1335/"
               className="footer-social-link"
@@ -45,3 +53,5 @@ export default function Footer() {
     </footer>
   )
 }
+
+

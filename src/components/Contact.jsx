@@ -47,7 +47,7 @@ const mobileSocialLinks = [
   { icon: <FaXTwitter />, href: 'https://x.com/AyushRa80083799', label: 'X (formerly Twitter)' },
 ]
 
-export default function Contact() {
+export default function Contact({ onTriggerSurprise }) {
   const [formData, setFormData] = useState({ name: '', email: '', message: '' })
   const [loading, setLoading] = useState(false)
   const [submitted, setSubmitted] = useState(false)
@@ -161,20 +161,45 @@ export default function Contact() {
 
               <div className="contact-socials-row">
                 {mobileSocialLinks.map((social, i) => (
-                  <motion.a
-                    key={i}
-                    href={social.href}
-                    className="contact-social-btn"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    aria-label={social.label}
-                    custom={i + 1}
-                    variants={linkItemVariants}
-                    whileHover={{ scale: 1.1, y: -3 }}
-                    whileTap={{ scale: 0.95 }}
-                  >
-                    {social.icon}
-                  </motion.a>
+                  <span key={i} style={{ display: 'contents' }}>
+                    <motion.a
+                      href={social.href}
+                      className="contact-social-btn"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label={social.label}
+                      custom={i + 1}
+                      variants={linkItemVariants}
+                      whileHover={{ scale: 1.1, y: -3 }}
+                      whileTap={{ scale: 0.95 }}
+                    >
+                      {social.icon}
+                    </motion.a>
+                    {i === 0 && (
+                      <motion.button
+                        type="button"
+                        onClick={onTriggerSurprise}
+                        className="contact-social-btn"
+                        aria-label="Surprise"
+                        custom={1.5}
+                        variants={linkItemVariants}
+                        whileHover={{ scale: 1.1, y: -3 }}
+                        whileTap={{ scale: 0.95 }}
+                        style={{
+                          background: 'none',
+                          border: 'none',
+                          padding: 0,
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          fontSize: '1.25rem',
+                          cursor: 'pointer'
+                        }}
+                      >
+                        🪐
+                      </motion.button>
+                    )}
+                  </span>
                 ))}
               </div>
             </div>
@@ -187,6 +212,7 @@ export default function Contact() {
             style={{ padding: '32px', x: rightX }}
           >
             <div className="form-group">
+              <label htmlFor="contact-name" className="form-label">Name</label>
               <input
                 type="text"
                 id="contact-name"
@@ -197,6 +223,7 @@ export default function Contact() {
               />
             </div>
             <div className="form-group">
+              <label htmlFor="contact-email" className="form-label">Email</label>
               <input
                 type="email"
                 id="contact-email"
@@ -207,6 +234,7 @@ export default function Contact() {
               />
             </div>
             <div className="form-group">
+              <label htmlFor="contact-message" className="form-label">Message</label>
               <textarea
                 id="contact-message"
                 placeholder="Hi Ayush, I'd love to work with you on..."
@@ -226,14 +254,20 @@ export default function Contact() {
             >
               {loading ? (
                 'Sending...'
-              ) : submitted ? (
-                '✓ Message Sent!'
-              ) : error ? (
-                '❌ Failed to send'
               ) : (
                 <><FiSend /> Send Message</>
               )}
             </motion.button>
+            {submitted && (
+              <motion.div
+                className="form-success-alert"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3 }}
+              >
+                ✓ Thank you! I will get back to you as soon as possible.
+              </motion.div>
+            )}
           </motion.form>
         </motion.div>
       </div>
