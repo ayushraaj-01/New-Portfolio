@@ -38,7 +38,7 @@ Hi, I'm **Ayush Raj**, a 3rd-year Computer Science Engineering student with a st
 - CSS3
 - JavaScript
 
-- **Backend**
+**Backend**
 - Node.js
 - express
 - jwt
