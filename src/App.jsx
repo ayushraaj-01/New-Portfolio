@@ -41,11 +41,52 @@ function App() {
     return () => window.removeEventListener('keydown', handleKeyDown)
   }, [])
 
-  const toggleTheme = () => {
-    setTheme(prev => {
-      const next = prev === 'dark' ? 'light' : 'dark'
-      localStorage.setItem('portfolio-theme', next)
-      return next
+  const toggleTheme = (e) => {
+    const audio = new Audio('/light-switch.mp3')
+    audio.volume = 1.0
+    audio.play().catch(err => console.log('Audio playback failed:', err))
+
+    const supportsViewTransition = document.startViewTransition && !window.matchMedia('(prefers-reduced-motion: reduce)').matches
+
+    if (!supportsViewTransition) {
+      setTheme(prev => {
+        const next = prev === 'dark' ? 'light' : 'dark'
+        localStorage.setItem('portfolio-theme', next)
+        return next
+      })
+      return
+    }
+
+    const x = e && e.clientX ? e.clientX : window.innerWidth / 2
+    const y = e && e.clientY ? e.clientY : window.innerHeight / 2
+
+    const endRadius = Math.hypot(
+      Math.max(x, window.innerWidth - x),
+      Math.max(y, window.innerHeight - y)
+    )
+
+    const transition = document.startViewTransition(() => {
+      setTheme(prev => {
+        const next = prev === 'dark' ? 'light' : 'dark'
+        localStorage.setItem('portfolio-theme', next)
+        return next
+      })
+    })
+
+    transition.ready.then(() => {
+      document.documentElement.animate(
+        {
+          clipPath: [
+            `circle(0px at ${x}px ${y}px)`,
+            `circle(${endRadius}px at ${x}px ${y}px)`
+          ]
+        },
+        {
+          duration: 450,
+          easing: 'cubic-bezier(0.4, 0, 0.2, 1)',
+          pseudoElement: '::view-transition-new(root)'
+        }
+      )
     })
   }
 

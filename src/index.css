@@ -2233,5 +2233,74 @@ section {
   box-shadow: 0 15px 25px rgba(255, 45, 123, 0.4);
 }
 
+/* ===== THEME TOGGLE LIGHTBULB PREMIUM ANIMATIONS ===== */
+.lightbulb-svg {
+  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), color 0.3s ease;
+  overflow: visible !important;
+}
+
+.theme-toggle:hover .lightbulb-svg,
+.theme-toggle-mobile:hover .lightbulb-svg {
+  transform: scale(1.1) rotate(5deg);
+}
+
+.theme-toggle:active .lightbulb-svg,
+.theme-toggle-mobile:active .lightbulb-svg {
+  transform: scale(0.9) rotate(-5deg);
+}
+
+/* Filament animations & glowing */
+.lightbulb-filament {
+  stroke: var(--text-secondary);
+  stroke-width: 1.2px;
+  transition: stroke 0.4s cubic-bezier(0.16, 1, 0.3, 1), filter 0.4s cubic-bezier(0.16, 1, 0.3, 1), fill 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+[data-theme="light"] .lightbulb-filament {
+  stroke: #ff9800;
+  fill: rgba(255, 152, 0, 0.2);
+  filter: drop-shadow(0 0 5px rgba(255, 152, 0, 0.95)) drop-shadow(0 0 12px rgba(255, 193, 7, 0.6));
+}
+
+/* Rays animations & scaling */
+.lightbulb-rays path {
+  transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  transform-origin: 16px 16px;
+}
+
+[data-theme="dark"] .lightbulb-rays path {
+  opacity: 0;
+  transform: scale(0.5);
+}
+
+[data-theme="light"] .lightbulb-rays path {
+  opacity: 1;
+  transform: scale(1);
+  stroke: #ff9800;
+  filter: drop-shadow(0 0 3px rgba(255, 152, 0, 0.8));
+}
+
+/* Make sure the bulb body glows slightly in light mode too */
+.lightbulb-svg > path:first-child {
+  transition: fill 0.4s ease, stroke 0.4s ease, opacity 0.4s ease;
+}
+
+[data-theme="light"] .lightbulb-svg > path:first-child {
+  fill: rgba(255, 235, 59, 0.15);
+  stroke: #ff9800;
+}
+
+/* View Transition API Circular Reveal Configuration */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
+/* Ensure the transition container covers everything */
+::view-transition-image-pair(root) {
+  isolation: auto;
+}
+
 
 
