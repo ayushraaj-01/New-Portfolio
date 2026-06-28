@@ -118,7 +118,7 @@ function TextScramble({ text, delay = 0 }) {
   }, [])
 
   return (
-    <span onMouseEnter={scramble} style={{ display: 'inline-block' }}>
+    <span onMouseEnter={scramble}>
       {displayText}
     </span>
   )
@@ -140,10 +140,15 @@ export default function Hero() {
   const blob3Y = useTransform(scrollYProgress, [0, 1], [0, -100])
   const contentOpacity = useTransform(scrollYProgress, [0, 0.6], [1, 0])
   const contentScale = useTransform(scrollYProgress, [0, 0.6], [1, 0.9])
-  
-  // Performance optimization: clamp blur and set to 'none' when 0 to avoid rasterization penalty
+
+  const isSafariOrIOS = typeof window !== 'undefined' && 
+    (/iPad|iPhone|iPod/.test(navigator.userAgent) || /^((?!chrome|android).)*safari/i.test(navigator.userAgent))
+
   const contentBlur = useTransform(scrollYProgress, [0, 0.6], [0, 6])
-  const filterString = useTransform(contentBlur, (v) => v > 0.1 ? `blur(${v}px)` : 'none')
+  const filterString = useTransform(contentBlur, (v) => {
+    if (isSafariOrIOS) return 'none'
+    return v > 0.1 ? `blur(${v}px)` : 'none'
+  })
 
   const handleScroll = (e, target) => {
     e.preventDefault()
@@ -184,8 +189,8 @@ export default function Hero() {
 
         <motion.h1
           className="hero-name"
-          initial={{ opacity: 0, y: 30, filter: 'blur(8px)' }}
-          animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+          initial={{ opacity: 0, y: 30, filter: isSafariOrIOS ? 'none' : 'blur(8px)' }}
+          animate={{ opacity: 1, y: 0, filter: isSafariOrIOS ? 'none' : 'blur(0px)' }}
           transition={{ delay: 0.4, duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
         >
           Hi, I'm{' '}

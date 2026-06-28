@@ -154,7 +154,7 @@ section {
   -webkit-backdrop-filter: blur(25px);
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 9999px;
-  box-shadow: 
+  box-shadow:
     0 12px 30px rgba(0, 0, 0, 0.25),
     0 1px 2px rgba(255, 255, 255, 0.05);
 }
@@ -163,7 +163,7 @@ section {
   top: 12px;
   background: rgba(10, 10, 10, 0.85);
   border-color: rgba(255, 255, 255, 0.14);
-  box-shadow: 
+  box-shadow:
     0 20px 40px rgba(0, 0, 0, 0.35),
     0 1px 2px rgba(255, 255, 255, 0.06);
 }
@@ -171,7 +171,7 @@ section {
 [data-theme="light"] .navbar {
   background: rgba(255, 255, 255, 0.82);
   border: 1px solid rgba(0, 0, 0, 0.08);
-  box-shadow: 
+  box-shadow:
     0 12px 30px rgba(0, 0, 0, 0.06),
     0 1px 2px rgba(0, 0, 0, 0.02);
 }
@@ -179,7 +179,7 @@ section {
 [data-theme="light"] .navbar.scrolled {
   background: rgba(255, 255, 255, 0.94);
   border-color: rgba(0, 0, 0, 0.12);
-  box-shadow: 
+  box-shadow:
     0 20px 40px rgba(0, 0, 0, 0.1),
     0 1px 2px rgba(0, 0, 0, 0.03);
 }
@@ -565,12 +565,14 @@ section {
   line-height: 1.05;
   margin-bottom: 20px;
 }
-
-.hero-name .gradient-text {
+.gradient-text {
   background: linear-gradient(135deg, var(--accent), #7b2dff, #ff2d7b);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+  display: inline;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
 }
 
 .hero-tagline {
@@ -1269,7 +1271,8 @@ section {
   margin-top: 16px;
   font-size: 0.85rem;
   font-weight: 500;
-  color: #10b981; /* Emerald green for professional success feedback */
+  color: #10b981;
+  /* Emerald green for professional success feedback */
   text-align: center;
   display: flex;
   align-items: center;
@@ -1324,7 +1327,17 @@ section {
 
 /* ===== POP CAT CURSOR ===== */
 @media (hover: hover) and (pointer: fine) {
-  html, body, a, button, [role="button"], input, select, textarea, .skill-chip, .project-card {
+
+  html,
+  body,
+  a,
+  button,
+  [role="button"],
+  input,
+  select,
+  textarea,
+  .skill-chip,
+  .project-card {
     cursor: none !important;
   }
 }
@@ -1334,7 +1347,8 @@ section {
   pointer-events: none;
   z-index: 99999;
   transition: opacity 0.15s ease;
-  transform: translate(-10px, -10px); /* Centers the hotspot near Pop Cat's mouth/ear */
+  transform: translate(-10px, -10px);
+  /* Centers the hotspot near Pop Cat's mouth/ear */
 }
 
 .popcat-cursor img {
@@ -1351,7 +1365,8 @@ section {
 
 /* ===== MOBILE BOTTOM ICON NAVBAR ===== */
 .mobile-bottom-nav {
-  display: none; /* Hidden on desktop */
+  display: none;
+  /* Hidden on desktop */
   position: fixed;
   bottom: 16px;
   left: 50%;
@@ -1789,7 +1804,8 @@ section {
   width: 120px;
   overflow: hidden;
   pointer-events: none;
-  opacity: 0.08; /* Increased from 0.025 for better visibility in dark mode */
+  opacity: 0.08;
+  /* Increased from 0.025 for better visibility in dark mode */
   z-index: 0;
   display: flex;
   justify-content: center;
@@ -1797,7 +1813,8 @@ section {
 }
 
 [data-theme="light"] .sidebar-bg-text-container {
-  opacity: 0.045; /* Adjusted for light mode contrast */
+  opacity: 0.045;
+  /* Adjusted for light mode contrast */
 }
 
 .sidebar-bg-text-container.left {
@@ -1903,7 +1920,7 @@ section {
   background: rgba(255, 255, 255, 0.015);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
-  box-shadow: 
+  box-shadow:
     0 20px 40px rgba(0, 0, 0, 0.3),
     inset 0 0 0 1px rgba(255, 255, 255, 0.02);
   overflow: hidden;
@@ -1971,8 +1988,8 @@ section {
   stroke-dasharray: 1.1;
   stroke-dashoffset: 0;
   opacity: 1;
-  transition: stroke-dashoffset 0.45s cubic-bezier(0.4, 0, 0.2, 1), 
-              opacity 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: stroke-dashoffset 0.45s cubic-bezier(0.4, 0, 0.2, 1),
+    opacity 0.45s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* Hide filament and rays in dark mode (bulb off) */
@@ -1998,7 +2015,8 @@ section {
 /* Make the lit lightbulb glow yellow when in light mode */
 [data-theme="light"] .theme-toggle,
 [data-theme="light"] .theme-toggle-mobile {
-  color: #ffb000 !important; /* Warm lightbulb glow yellow */
+  color: #ffb000 !important;
+  /* Warm lightbulb glow yellow */
 }
 
 /* Add drop-shadow glow to the lightbulb in light mode */
@@ -2046,6 +2064,7 @@ section {
     height: 10px;
     opacity: 0.8;
   }
+
   100% {
     width: 60px;
     height: 60px;
@@ -2141,19 +2160,32 @@ section {
   0% {
     text-shadow: 0 0 4px var(--accent-glow);
   }
+
   100% {
     text-shadow: 0 0 15px var(--accent);
   }
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
 }
 
 @keyframes scaleUp {
-  from { transform: scale(0.9) translateY(20px); opacity: 0; }
-  to { transform: scale(1) translateY(0); opacity: 1; }
+  from {
+    transform: scale(0.9) translateY(20px);
+    opacity: 0;
+  }
+
+  to {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+  }
 }
 
 .footer-surprise-btn {
@@ -2185,8 +2217,13 @@ section {
 }
 
 @keyframes bounceEmoji {
-  0% { transform: translateY(0) scale(1); }
-  100% { transform: translateY(-8px) scale(1.1); }
+  0% {
+    transform: translateY(0) scale(1);
+  }
+
+  100% {
+    transform: translateY(-8px) scale(1.1);
+  }
 }
 
 .surprise-modal-title {
@@ -2281,11 +2318,11 @@ section {
 }
 
 /* Make sure the bulb body glows slightly in light mode too */
-.lightbulb-svg > path:first-child {
+.lightbulb-svg>path:first-child {
   transition: fill 0.4s ease, stroke 0.4s ease, opacity 0.4s ease;
 }
 
-[data-theme="light"] .lightbulb-svg > path:first-child {
+[data-theme="light"] .lightbulb-svg>path:first-child {
   fill: rgba(255, 235, 59, 0.15);
   stroke: #ff9800;
 }
@@ -2301,6 +2338,3 @@ section {
 ::view-transition-image-pair(root) {
   isolation: auto;
 }
-
-
-

@@ -223,3 +223,33 @@ export const rotateIn = {
     transition: { duration: 0.7, ease: smoothEase },
   },
 }
+
+/* ─── Scroll Minimize Wrapper ─── */
+export function ScrollMinimizeWrapper({ children }) {
+  const ref = useRef(null)
+  const { scrollYProgress } = useScroll({
+    target: ref,
+    offset: ['start start', 'end start'],
+  })
+
+  const y = useTransform(scrollYProgress, [0, 1], [0, -120])
+  const opacity = useTransform(scrollYProgress, [0, 0.6], [1, 0])
+  const scale = useTransform(scrollYProgress, [0, 0.6], [1, 0.9])
+  const blur = useTransform(scrollYProgress, [0, 0.6], [0, 6])
+  
+  const filter = useTransform(blur, (v) => {
+    if (typeof window === 'undefined') return 'none'
+    const isSafariOrIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || 
+                          /^((?!chrome|android).)*safari/i.test(navigator.userAgent)
+    if (isSafariOrIOS) return 'none'
+    return v > 0.1 ? `blur(${v}px)` : 'none'
+  })
+
+  return (
+    <div ref={ref} style={{ width: '100%' }}>
+      <motion.div style={{ y, opacity, scale, filter }}>
+        {children}
+      </motion.div>
+    </div>
+  )
+}
