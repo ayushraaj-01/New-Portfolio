@@ -248,13 +248,17 @@ export default function Hero() {
 
       <motion.div
         className="hero-scroll-indicator"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
+        initial={{ opacity: 0, y: 15 }}
+        animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 1.4, duration: 0.6 }}
         style={{ opacity: contentOpacity }}
       >
-        <span>Scroll</span>
-        <div className="scroll-line" />
+        <div className="scroll-indicator-cool">
+          <div className="mouse-outline">
+            <div className="mouse-wheel" />
+          </div>
+          <div className="scroll-track" />
+        </div>
       </motion.div>
     </section>
   )
