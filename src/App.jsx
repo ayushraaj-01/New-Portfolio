@@ -10,6 +10,7 @@ import Contact from './components/Contact'
 import Footer from './components/Footer'
 import CursorDot from './components/CursorDot'
 import { SectionDivider } from './components/animations'
+import CameraLoader from './components/CameraLoader'
 
 const sections = ['hero', 'about', 'skills', 'projects', 'certifications', 'contact']
 
@@ -22,6 +23,22 @@ function App() {
   })
   const [activeSection, setActiveSection] = useState('hero')
   const [showSurprise, setShowSurprise] = useState(false)
+  const [loading, setLoading] = useState(true)
+
+  // Prevent scroll during loading phase
+  useEffect(() => {
+    if (loading) {
+      document.body.style.overflow = 'hidden'
+      document.documentElement.style.overflow = 'hidden'
+    } else {
+      document.body.style.overflow = ''
+      document.documentElement.style.overflow = ''
+    }
+    return () => {
+      document.body.style.overflow = ''
+      document.documentElement.style.overflow = ''
+    }
+  }, [loading])
 
   // Keyboard sequence listener for "rick"
   useEffect(() => {
@@ -126,6 +143,7 @@ function App() {
 
   return (
     <>
+      {loading && <CameraLoader onComplete={() => setLoading(false)} />}
       <CursorDot />
 
       {/* Progress bar */}

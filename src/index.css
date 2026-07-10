@@ -2410,3 +2410,55 @@ section {
 ::view-transition-image-pair(root) {
   isolation: auto;
 }
+
+/* ===== CAMERA APERTURE PAGE LOADER ===== */
+.camera-loader-overlay {
+  background-color: #030303;
+  color: #ffffff;
+}
+
+/* Technologically styled grid backdrop for loader */
+.loader-grid-bg {
+  position: absolute;
+  inset: 0;
+  background-size: 60px 60px;
+  background-image:
+    linear-gradient(to right, rgba(255, 255, 255, 0.015) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.015) 1px, transparent 1px),
+    radial-gradient(circle at 1px 1px, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+  opacity: 0.8;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.lens-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1;
+}
+
+.lens-svg {
+  will-change: transform;
+}
+
+.aperture-blade {
+  will-change: transform;
+}
+
+/* Subtle pulse glow for SYS.INIT HUD text */
+@keyframes hudBreathe {
+  0%, 100% {
+    opacity: 0.4;
+    text-shadow: 0 0 8px rgba(0, 212, 255, 0.1);
+  }
+  50% {
+    opacity: 0.8;
+    text-shadow: 0 0 15px rgba(0, 212, 255, 0.4);
+  }
+}
+
+.loader-hud-label {
+  animation: hudBreathe 2s ease-in-out infinite;
+}
