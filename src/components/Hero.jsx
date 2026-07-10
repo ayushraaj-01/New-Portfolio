@@ -1,5 +1,5 @@
-import { useState, useEffect, useRef, useCallback } from 'react'
-import { motion, useScroll, useTransform, useSpring } from 'framer-motion'
+import { useState, useEffect, useRef } from 'react'
+import { motion, useScroll, useTransform } from 'framer-motion'
 import { FiArrowRight, FiExternalLink } from 'react-icons/fi'
 
 const roles = ['Developer', 'Builder', 'Problem Solver', 'Creator', 'Innovator']
@@ -34,95 +34,7 @@ function useTypewriter(words, typingSpeed = 100, deletingSpeed = 60, pauseTime =
   return text
 }
 
-const glyphs = 'QWERTYUIOPASDFGHJKLZXCVBNM0123456789!@#$%^&*()_+{}|:"<>?[]\\;\',./~अबकमयरलशहभतदधनपफबभम'
 
-function TextScramble({ text, delay = 0 }) {
-  const [displayText, setDisplayText] = useState(text)
-  const [isScrambling, setIsScrambling] = useState(false)
-
-  const scramble = useCallback(() => {
-    if (isScrambling) return
-    setIsScrambling(true)
-
-    let frame = 0
-    const queue = []
-    const words = text.split(' ')
-    let wordDelayOffset = 0
-    
-    for (let w = 0; w < words.length; w++) {
-      const word = words[w]
-      
-      for (let i = 0; i < word.length; i++) {
-        const from = '_'
-        const to = word[i]
-        const start = wordDelayOffset + Math.floor(Math.random() * 15)
-        const end = start + 30 + Math.floor(Math.random() * 25)
-        queue.push({ from, to, start, end, char: '' })
-      }
-      
-      if (w < words.length - 1) {
-        queue.push({ from: ' ', to: ' ', start: 0, end: 0, char: ' ' })
-      }
-      
-      wordDelayOffset += 45
-    }
-
-    let cancelFrame
-    const update = () => {
-      let output = ''
-      let complete = 0
-
-      for (let i = 0; i < queue.length; i++) {
-        let { from, to, start, end, char } = queue[i]
-        
-        if (to === ' ') {
-          output += ' '
-          complete++
-          continue
-        }
-
-        if (frame >= end) {
-          complete++
-          output += to
-        } else if (frame >= start) {
-          if (!char || Math.random() < 0.28) {
-            char = glyphs[Math.floor(Math.random() * glyphs.length)]
-            queue[i].char = char
-          }
-          output += char
-        } else {
-          output += from
-        }
-      }
-
-      setDisplayText(output)
-
-      if (complete === queue.length) {
-        setIsScrambling(false)
-      } else {
-        frame++
-        cancelFrame = requestAnimationFrame(update)
-      }
-    }
-
-    cancelFrame = requestAnimationFrame(update)
-    return () => cancelAnimationFrame(cancelFrame)
-  }, [text, isScrambling])
-
-  useEffect(() => {
-    const timeout = setTimeout(() => {
-      scramble()
-    }, delay * 1000)
-
-    return () => clearTimeout(timeout)
-  }, [])
-
-  return (
-    <span onMouseEnter={scramble}>
-      {displayText}
-    </span>
-  )
-}
 
 export default function Hero() {
   const typedText = useTypewriter(roles)
@@ -195,7 +107,7 @@ export default function Hero() {
         >
           Hi, I'm{' '}
           <span className="gradient-text">
-            <TextScramble text="Ayush Raj" delay={0.6} />
+            Ayush Raj
           </span>
         </motion.h1>
 
