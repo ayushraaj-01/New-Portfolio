@@ -39,6 +39,7 @@ function useTypewriter(words, typingSpeed = 100, deletingSpeed = 60, pauseTime =
 export default function Hero() {
   const typedText = useTypewriter(roles)
   const heroRef = useRef(null)
+  const particlesCanvasRef = useRef(null)
 
   const { scrollYProgress } = useScroll({
     target: heroRef,
@@ -67,6 +68,135 @@ export default function Hero() {
     document.querySelector(target)?.scrollIntoView({ behavior: 'smooth' })
   }
 
+  // Interactive Particle Constellation Effect
+  useEffect(() => {
+    const canvas = particlesCanvasRef.current
+    if (!canvas) return
+    const ctx = canvas.getContext('2d')
+    let animationFrameId
+
+    let width = canvas.width = canvas.parentElement.clientWidth
+    let height = canvas.height = canvas.parentElement.clientHeight
+
+    const particles = []
+    const numParticles = Math.min(80, Math.floor((width * height) / 15000))
+    const connectionDistance = 110
+    const mouse = { x: null, y: null, radius: 150 }
+
+    // Colors matching theme
+    const getAccentColor = () => {
+      const theme = document.documentElement.getAttribute('data-theme')
+      return theme === 'light' ? 'rgba(0, 144, 179, ' : 'rgba(0, 212, 255, '
+    }
+
+    class Particle {
+      constructor() {
+        this.x = Math.random() * width
+        this.y = Math.random() * height
+        this.vx = (Math.random() - 0.5) * 0.6
+        this.vy = (Math.random() - 0.5) * 0.6
+        this.radius = Math.random() * 2 + 1
+      }
+
+      update() {
+        this.x += this.vx
+        this.y += this.vy
+
+        // Bounce walls
+        if (this.x < 0 || this.x > width) this.vx *= -1
+        if (this.y < 0 || this.y > height) this.vy *= -1
+
+        // Mouse attraction/push
+        if (mouse.x !== null && mouse.y !== null) {
+          const dx = mouse.x - this.x
+          const dy = mouse.y - this.y
+          const dist = Math.sqrt(dx * dx + dy * dy)
+          if (dist < mouse.radius) {
+            const force = (mouse.radius - dist) / mouse.radius
+            this.x -= dx * force * 0.03
+            this.y -= dy * force * 0.03
+          }
+        }
+      }
+
+      draw() {
+        ctx.beginPath()
+        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2)
+        ctx.fillStyle = getAccentColor() + '0.5)'
+        ctx.fill()
+      }
+    }
+
+    // Initialize particles
+    for (let i = 0; i < numParticles; i++) {
+      particles.push(new Particle())
+    }
+
+    // Listeners
+    const handleMouseMove = (e) => {
+      const rect = canvas.getBoundingClientRect()
+      mouse.x = e.clientX - rect.left
+      mouse.y = e.clientY - rect.top
+    }
+
+    const handleMouseLeave = () => {
+      mouse.x = null
+      mouse.y = null
+    }
+
+    window.addEventListener('mousemove', handleMouseMove)
+    canvas.parentElement.addEventListener('mouseleave', handleMouseLeave)
+
+    const handleResize = () => {
+      width = canvas.width = canvas.parentElement.clientWidth
+      height = canvas.height = canvas.parentElement.clientHeight
+    }
+    window.addEventListener('resize', handleResize)
+
+    // Loop
+    const draw = () => {
+      ctx.clearRect(0, 0, width, height)
+
+      // Update and draw particles
+      particles.forEach(p => {
+        p.update()
+        p.draw()
+      })
+
+      // Draw lines
+      const colorPrefix = getAccentColor()
+      for (let i = 0; i < particles.length; i++) {
+        for (let j = i + 1; j < particles.length; j++) {
+          const p1 = particles[i]
+          const p2 = particles[j]
+          const dx = p1.x - p2.x
+          const dy = p1.y - p2.y
+          const dist = Math.sqrt(dx * dx + dy * dy)
+
+          if (dist < connectionDistance) {
+            const alpha = (1 - dist / connectionDistance) * 0.15
+            ctx.beginPath()
+            ctx.moveTo(p1.x, p1.y)
+            ctx.lineTo(p2.x, p2.y)
+            ctx.strokeStyle = colorPrefix + `${alpha})`
+            ctx.lineWidth = 1
+            ctx.stroke()
+          }
+        }
+      }
+
+      animationFrameId = requestAnimationFrame(draw)
+    }
+
+    draw()
+
+    return () => {
+      cancelAnimationFrame(animationFrameId)
+      window.removeEventListener('mousemove', handleMouseMove)
+      window.removeEventListener('resize', handleResize)
+    }
+  }, [])
+
   return (
     <section className="hero" id="hero" ref={heroRef}>
       {/* Noise overlay */}
@@ -74,6 +204,9 @@ export default function Hero() {
 
       {/* Grid overlay */}
       <div className="hero-grid" />
+
+      {/* Interactive floating particles canvas */}
+      <canvas ref={particlesCanvasRef} className="hero-particles-canvas" />
 
       {/* Animated gradient blobs with parallax */}
       <motion.div className="hero-blob hero-blob-1" style={{ y: blob1Y }} />
