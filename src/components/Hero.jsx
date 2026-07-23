@@ -54,7 +54,7 @@ export default function Hero() {
   const contentOpacity = useTransform(scrollYProgress, [0, 0.6], [1, 0])
   const contentScale = useTransform(scrollYProgress, [0, 0.6], [1, 0.9])
 
-  const isSafariOrIOS = typeof window !== 'undefined' && 
+  const isSafariOrIOS = typeof window !== 'undefined' &&
     (/iPad|iPhone|iPod/.test(navigator.userAgent) || /^((?!chrome|android).)*safari/i.test(navigator.userAgent))
 
   const contentBlur = useTransform(scrollYProgress, [0, 0.6], [0, 6])
@@ -86,7 +86,7 @@ export default function Hero() {
     // Colors matching theme
     const getAccentColor = () => {
       const theme = document.documentElement.getAttribute('data-theme')
-      return theme === 'light' ? 'rgba(0, 144, 179, ' : 'rgba(0, 212, 255, '
+      return theme === 'light' ? 'rgba(88, 124, 0, ' : 'rgba(204, 255, 0, '
     }
 
     class Particle {

@@ -155,7 +155,7 @@ function App() {
           left: 0,
           right: 0,
           height: '2px',
-          background: 'linear-gradient(90deg, #00d4ff, #7b2dff, #ff2d7b)',
+          background: 'var(--gradient-text)',
           transformOrigin: '0%',
           zIndex: 1001,
         }}

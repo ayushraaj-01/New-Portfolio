@@ -3,41 +3,41 @@ import { motion, useScroll, useTransform, useSpring } from 'framer-motion'
 import { AnimatedSectionHeader } from './animations'
 
 const initialNodes = [
-  // Core category nodes (White)
-  { id: 'Backend Core', label: 'Backend Core', color: '#ffffff', size: 20, isCore: true },
-  { id: 'Frontend Core', label: 'Frontend Core', color: '#ffffff', size: 20, isCore: true },
-  { id: 'Language Core', label: 'Language Core', color: '#ffffff', size: 20, isCore: true },
-  { id: 'Tooling Core', label: 'Tooling Core', color: '#ffffff', size: 20, isCore: true },
+  // Core category nodes (Beige)
+  { id: 'Backend Core', label: 'Backend Core', color: '#f5efe6', size: 20, isCore: true },
+  { id: 'Frontend Core', label: 'Frontend Core', color: '#f5efe6', size: 20, isCore: true },
+  { id: 'Language Core', label: 'Language Core', color: '#f5efe6', size: 20, isCore: true },
+  { id: 'Tooling Core', label: 'Tooling Core', color: '#f5efe6', size: 20, isCore: true },
 
-  // Backend (connected to Backend Core) -> Green/Emerald
-  { id: 'Node.js', label: 'Node.js', color: '#10b981', size: 13 },
-  { id: 'Express', label: 'Express', color: '#10b981', size: 13 },
-  { id: 'MySQL', label: 'MySQL', color: '#10b981', size: 13 },
-  { id: 'MongoDB', label: 'MongoDB', color: '#10b981', size: 13 },
-  { id: 'REST APIs', label: 'REST APIs', color: '#10b981', size: 13 },
-  { id: 'JWT', label: 'JWT', color: '#10b981', size: 13 },
-  { id: 'Socket.io', label: 'Socket.io', color: '#10b981', size: 13 },
-  { id: 'Go', label: 'Go', color: '#10b981', size: 13 },
+  // Backend (connected to Backend Core) -> Neon Lime
+  { id: 'Node.js', label: 'Node.js', color: '#ccff00', size: 13 },
+  { id: 'Express', label: 'Express', color: '#ccff00', size: 13 },
+  { id: 'MySQL', label: 'MySQL', color: '#ccff00', size: 13 },
+  { id: 'MongoDB', label: 'MongoDB', color: '#ccff00', size: 13 },
+  { id: 'REST APIs', label: 'REST APIs', color: '#ccff00', size: 13 },
+  { id: 'JWT', label: 'JWT', color: '#ccff00', size: 13 },
+  { id: 'Socket.io', label: 'Socket.io', color: '#ccff00', size: 13 },
+  { id: 'Go', label: 'Go', color: '#ccff00', size: 13 },
 
-  // Frontend (connected to Frontend Core) -> Blue/Cyan
-  { id: 'React', label: 'React', color: '#3b82f6', size: 13 },
-  { id: 'Next.js', label: 'Next.js', color: '#3b82f6', size: 13 },
-  { id: 'Tailwind CSS', label: 'Tailwind CSS', color: '#3b82f6', size: 13 },
-  { id: 'HTML/CSS', label: 'HTML/CSS', color: '#3b82f6', size: 13 },
-  { id: 'JavaScript', label: 'JavaScript', color: '#3b82f6', size: 13 },
+  // Frontend (connected to Frontend Core) -> Warm Beige
+  { id: 'React', label: 'React', color: '#e5d9c5', size: 13 },
+  { id: 'Next.js', label: 'Next.js', color: '#e5d9c5', size: 13 },
+  { id: 'Tailwind CSS', label: 'Tailwind CSS', color: '#e5d9c5', size: 13 },
+  { id: 'HTML/CSS', label: 'HTML/CSS', color: '#e5d9c5', size: 13 },
+  { id: 'JavaScript', label: 'JavaScript', color: '#e5d9c5', size: 13 },
 
-  // Languages & Algorithms (connected to Language Core) -> Purple
-  { id: 'Python', label: 'Python', color: '#8b5cf6', size: 13 },
-  { id: 'C', label: 'C', color: '#8b5cf6', size: 13 },
-  { id: 'C++', label: 'C++', color: '#8b5cf6', size: 13 },
-  { id: 'Java', label: 'Java', color: '#8b5cf6', size: 13 },
+  // Languages & Algorithms (connected to Language Core) -> Electric Lime
+  { id: 'Python', label: 'Python', color: '#a3e635', size: 13 },
+  { id: 'C', label: 'C', color: '#a3e635', size: 13 },
+  { id: 'C++', label: 'C++', color: '#a3e635', size: 13 },
+  { id: 'Java', label: 'Java', color: '#a3e635', size: 13 },
 
-  // Tools & DevOps (connected to Tooling Core) -> Pink/Crimson
-  { id: 'Git', label: 'Git', color: '#ec4899', size: 13 },
-  { id: 'Docker', label: 'Docker', color: '#ec4899', size: 13 },
-  { id: 'Vercel', label: 'Vercel', color: '#ec4899', size: 13 },
-  { id: 'Postman', label: 'Postman', color: '#ec4899', size: 13 },
-  { id: 'npm', label: 'npm', color: '#ec4899', size: 13 },
+  // Tools & DevOps (connected to Tooling Core) -> Soft Muted Beige
+  { id: 'Git', label: 'Git', color: '#d4c5b2', size: 13 },
+  { id: 'Docker', label: 'Docker', color: '#d4c5b2', size: 13 },
+  { id: 'Vercel', label: 'Vercel', color: '#d4c5b2', size: 13 },
+  { id: 'Postman', label: 'Postman', color: '#d4c5b2', size: 13 },
+  { id: 'npm', label: 'npm', color: '#d4c5b2', size: 13 },
 ]
 
 const initialLinks = [
@@ -66,7 +66,7 @@ const initialLinks = [
   { source: 'Tooling Core', target: 'Vercel' },
   { source: 'Tooling Core', target: 'Postman' },
   { source: 'Tooling Core', target: 'npm' },
-  
+
   // Inter-core connections
   { source: 'Backend Core', target: 'Frontend Core' },
   { source: 'Frontend Core', target: 'Tooling Core' },
@@ -262,7 +262,7 @@ export default function Skills() {
   const handleStartDrag = (nodeId, e) => {
     if (e.cancelable) e.preventDefault()
     setDraggedNode(nodeId)
-    
+
     const clientX = (e.touches && e.touches.length > 0) ? e.touches[0].clientX : e.clientX
     const clientY = (e.touches && e.touches.length > 0) ? e.touches[0].clientY : e.clientY
 
@@ -287,7 +287,7 @@ export default function Skills() {
   const handleDrag = useCallback((e) => {
     if (!draggedNode) return
     if (e.cancelable) e.preventDefault()
-    
+
     const clientX = (e.touches && e.touches.length > 0) ? e.touches[0].clientX : e.clientX
     const clientY = (e.touches && e.touches.length > 0) ? e.touches[0].clientY : e.clientY
 
@@ -361,7 +361,7 @@ export default function Skills() {
               if (!sourceNode || !targetNode) return null
 
               const isCoreToCore = sourceNode.isCore && targetNode.isCore
-              
+
               // Determine line color and opacity based on connection type
               let lineColor
               if (isCoreToCore) {

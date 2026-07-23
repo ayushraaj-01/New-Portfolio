@@ -7,7 +7,7 @@ const zoomEase = [0.76, 0, 0.24, 1]
 
 export default function CameraLoader({ onComplete }) {
   const [phase, setPhase] = useState('closed') // closed -> opening -> zooming -> complete
-  
+
   useEffect(() => {
     // Stage 1: Closed on mount, wait 400ms then open the aperture blades
     const openTimeout = setTimeout(() => {
@@ -98,9 +98,9 @@ export default function CameraLoader({ onComplete }) {
 
                 {/* Glass reflection glow */}
                 <radialGradient id="glass-glow" cx="30%" cy="30%" r="70%">
-                  <stop offset="0%" stopColor="rgba(0, 212, 255, 0.15)" />
-                  <stop offset="35%" stopColor="rgba(123, 45, 255, 0.08)" />
-                  <stop offset="70%" stopColor="rgba(255, 45, 123, 0.02)" />
+                  <stop offset="0%" stopColor="rgba(204, 255, 0, 0.18)" />
+                  <stop offset="35%" stopColor="rgba(245, 239, 230, 0.08)" />
+                  <stop offset="70%" stopColor="rgba(204, 255, 0, 0.02)" />
                   <stop offset="100%" stopColor="rgba(0,0,0,0)" />
                 </radialGradient>
 
@@ -119,13 +119,13 @@ export default function CameraLoader({ onComplete }) {
               {/* 1. Outer Metal Lens Barrel */}
               <circle cx="300" cy="300" r="290" fill="url(#lens-body)" stroke="#222" strokeWidth="4" />
               <circle cx="300" cy="300" r="280" fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="1" />
-              
+
               {/* Outer grip ridges */}
               <circle cx="300" cy="300" r="275" fill="none" stroke="#111" strokeWidth="8" strokeDasharray="3 3" />
 
               {/* 2. Lens Specs Ring with Text Path */}
               <circle cx="300" cy="300" r="260" fill="#0d0d10" stroke="#1c1c20" strokeWidth="3" />
-              
+
               {/* Technical markings and specs */}
               <text fill="#888" fontSize="10.5" fontFamily="monospace" letterSpacing="1.8">
                 <textPath href="#specs-text-path" startOffset="0%">
@@ -135,7 +135,7 @@ export default function CameraLoader({ onComplete }) {
 
               {/* 3. Focal rings and indicators */}
               <circle cx="300" cy="300" r="228" fill="none" stroke="#222" strokeWidth="2" />
-              
+
               {/* Ticks ring */}
               <circle
                 cx="300"
@@ -146,7 +146,7 @@ export default function CameraLoader({ onComplete }) {
                 strokeWidth="6"
                 strokeDasharray="2 12"
               />
-              
+
               {/* Gold Accent Ring */}
               <circle cx="300" cy="300" r="195" fill="none" stroke="url(#gold-gradient)" strokeWidth="2" />
               <circle cx="300" cy="300" r="190" fill="#070708" stroke="#18181b" strokeWidth="3" />
@@ -180,7 +180,7 @@ export default function CameraLoader({ onComplete }) {
                     >
                       {/* Pivot joint screw */}
                       <circle cx="0" cy="0" r="2.5" fill="url(#gold-gradient)" opacity="0.8" />
-                      
+
                       <motion.path
                         className="aperture-blade"
                         // Advanced organic curved blade shape relative to local pivot (0,0)
@@ -214,7 +214,7 @@ export default function CameraLoader({ onComplete }) {
               <path
                 d="M 220,420 A 170,170 0 0,1 380,420"
                 fill="none"
-                stroke="rgba(0, 212, 255, 0.05)"
+                stroke="rgba(204, 255, 0, 0.08)"
                 strokeWidth="1.5"
                 strokeLinecap="round"
                 pointerEvents="none"

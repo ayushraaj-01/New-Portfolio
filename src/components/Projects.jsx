@@ -62,13 +62,13 @@ export default function Projects() {
       const gap = isSmallMobile ? 16 : (isMobile ? 20 : 32)
       const padding = isSmallMobile ? 40 : (isMobile ? 80 : 160)
       const numCards = projects.length
-      
+
       const leftOfLastCard = (padding / 2) + (numCards - 1) * (cardWidth + gap)
       const centerOfLastCard = leftOfLastCard + cardWidth / 2
       const targetTranslate = centerOfLastCard - vw / 2
       setMaxTranslate(Math.max(0, targetTranslate))
     }
-    
+
     handleResize()
     window.addEventListener('resize', handleResize)
     return () => window.removeEventListener('resize', handleResize)
@@ -109,9 +109,9 @@ export default function Projects() {
   }, [])
 
   return (
-    <section 
-      ref={targetRef} 
-      className="projects-sticky-section" 
+    <section
+      ref={targetRef}
+      className="projects-sticky-section"
       id="projects"
       style={{ height: `${viewportHeight + maxTranslate}px` }}
     >
@@ -120,8 +120,8 @@ export default function Projects() {
           <AnimatedSectionHeader label="Projects" title="My projects" />
         </div>
 
-        <motion.div 
-          className="projects-horizontal-track" 
+        <motion.div
+          className="projects-horizontal-track"
           style={{ x: smoothX }}
         >
 

@@ -47,7 +47,7 @@ export default function Navbar({ theme, toggleTheme }) {
   return (
     <>
       <a href="#" className="brand-monogram" onClick={e => handleNavClick(e, '#hero')} aria-label="Home">
-        ayush<span className="accent">.</span>dev
+        ayushh<span className="accent">.</span>tech
       </a>
 
       {/* Desktop top navbar */}
