@@ -1,8 +1,8 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
   <defs>
     <linearGradient id="favicon-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#00d4ff" />
-      <stop offset="100%" stop-color="#7b2dff" />
+      <stop offset="0%" stop-color="#ccff00" />
+      <stop offset="100%" stop-color="#f5efe6" />
     </linearGradient>
     <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
       <feGaussianBlur stdDeviation="16" result="blur" />
@@ -10,7 +10,7 @@
     </filter>
   </defs>
   <!-- Sleek Solid Dark Background to prevent camouflaging -->
-  <rect x="24" y="24" width="464" height="464" rx="128" fill="#0d0e12" />
+  <rect x="24" y="24" width="464" height="464" rx="128" fill="#09090b" />
   <!-- Glowing border outline -->
   <rect x="24" y="24" width="464" height="464" rx="128" fill="none" stroke="url(#favicon-gradient)" stroke-width="20" filter="url(#glow)" />
   <!-- Monogram text with high contrast bright gradient fill -->
