@@ -63,9 +63,11 @@ function App() {
     audio.volume = 1.0
     audio.play().catch(err => console.log('Audio playback failed:', err))
 
+    // On mobile/touch devices, skip the heavy View Transition circular animation
+    const isMobile = window.matchMedia('(hover: none) and (pointer: coarse)').matches
     const supportsViewTransition = document.startViewTransition && !window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
-    if (!supportsViewTransition) {
+    if (!supportsViewTransition || isMobile) {
       setTheme(prev => {
         const next = prev === 'dark' ? 'light' : 'dark'
         localStorage.setItem('portfolio-theme', next)
