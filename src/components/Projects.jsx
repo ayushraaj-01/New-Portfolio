@@ -19,6 +19,7 @@ const projects = [
     expandedInfo: 'Developed with Node.js and Express for URL redirection logic, MongoDB/Mongoose for analytics storage, and a React frontend for the dashboard interface.',
     tags: ['React', 'Node.js', 'Express', 'MongoDB'],
     github: 'https://github.com/ayushraaj-01/URL-shortner',
+    demo: 'https://url-shortner-coral-rho.vercel.app',
   },
   {
     number: '03',
