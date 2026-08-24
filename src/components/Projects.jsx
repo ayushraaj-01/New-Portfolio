@@ -11,6 +11,7 @@ const projects = [
     expandedInfo: 'Designed and built with Socket.io for bidirectional communication, Node.js/Express for backend logic, and MySQL for persistent chat and user records.',
     tags: ['React', 'Node.js', 'Socket.io', 'MySQL', 'JWT'],
     github: 'https://github.com/ayushraaj-01/realtime-chat-app',
+    demo: 'https://realtime-chat-app-1-eight.vercel.app/',
   },
   {
     number: '02',
