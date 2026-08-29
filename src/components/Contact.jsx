@@ -1,7 +1,7 @@
 import { useState, useRef } from 'react'
 import { motion, useScroll, useTransform } from 'framer-motion'
 import { FiMail, FiGithub, FiLinkedin, FiSend } from 'react-icons/fi'
-import { FaXTwitter } from 'react-icons/fa6'
+import { FaXTwitter, FaDiscord } from 'react-icons/fa6'
 import { AnimatedSectionHeader, RevealOnScroll, smoothEase } from './animations'
 
 const fadeInLeft = {
@@ -45,6 +45,7 @@ const mobileSocialLinks = [
   { icon: <FiGithub />, href: 'https://github.com/ayushraaj-01', label: 'GitHub' },
   { icon: <FiLinkedin />, href: 'https://linkedin.com/in/ayush-raj-3849a1335/', label: 'LinkedIn' },
   { icon: <FaXTwitter />, href: 'https://x.com/AyushRa80083799', label: 'X (formerly Twitter)' },
+  { icon: <FaDiscord />, href: 'https://discord.com/users/1461037977420693703', label: 'Discord' },
 ]
 
 export default function Contact({ onTriggerSurprise }) {
@@ -266,6 +267,16 @@ export default function Contact({ onTriggerSurprise }) {
                 transition={{ duration: 0.3 }}
               >
                 ✓ Thank you! I will get back to you as soon as possible.
+              </motion.div>
+            )}
+            {error && (
+              <motion.div
+                className="form-error-alert"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3 }}
+              >
+                ✕ Couldn't send — please email me directly at ayushr94150@gmail.com.
               </motion.div>
             )}
           </motion.form>

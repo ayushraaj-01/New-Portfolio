@@ -41,10 +41,10 @@ const projects = [
   {
     number: '05',
     title: 'Netflix Clone',
-    description: 'A feature-rich replica of Netflix with profile selection, interactive video/trailer trailers playback, and dynamic search features.',
+    description: 'A feature-rich replica of Netflix with profile selection, interactive video and trailer playback, and dynamic search features.',
     expandedInfo: 'Built with React for UI components, Tailwind CSS for layout styling, Firebase for authentication, and TMDB API for streaming content metadata.',
     tags: ['React', 'Firebase', 'Tailwind CSS', 'TMDB API'],
-    github: 'https://github.com/ayushraaj-01/netflix-clone-anti/tree/main/OneDrive/Desktop/clone',
+    github: 'https://github.com/ayushraaj-01/netflix-clone-anti',
   },
 ]
 
@@ -162,7 +162,7 @@ export default function Projects() {
                       target="_blank"
                       rel="noopener noreferrer"
                       aria-label={`${project.title} GitHub`}
-                      whileHover={{ x: 4, color: '#00d4ff' }}
+                      whileHover={{ x: 4 }}
                     >
                       <FiGithub /> Code
                     </motion.a>
@@ -173,7 +173,7 @@ export default function Projects() {
                         target="_blank"
                         rel="noopener noreferrer"
                         aria-label={`${project.title} live demo`}
-                        whileHover={{ x: 4, color: '#00d4ff' }}
+                        whileHover={{ x: 4 }}
                       >
                         <FiExternalLink /> Live Demo
                       </motion.a>

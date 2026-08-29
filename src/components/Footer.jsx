@@ -1,5 +1,5 @@
 import { FiGithub, FiLinkedin } from 'react-icons/fi'
-import { FaXTwitter } from 'react-icons/fa6'
+import { FaXTwitter, FaDiscord } from 'react-icons/fa6'
 
 export default function Footer({ onTriggerSurprise }) {
   const year = new Date().getFullYear()
@@ -46,6 +46,15 @@ export default function Footer({ onTriggerSurprise }) {
               aria-label="X (formerly Twitter)"
             >
               <FaXTwitter />
+            </a>
+            <a
+              href="https://discord.com/users/1461037977420693703"
+              className="footer-social-link"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Discord"
+            >
+              <FaDiscord />
             </a>
           </div>
         </div>

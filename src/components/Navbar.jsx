@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react'
-import { FiHome, FiUser, FiFolder, FiAward, FiMail } from 'react-icons/fi'
+import { useState, useEffect, useRef } from 'react'
+import { FiHome, FiUser, FiFolder, FiAward, FiMail, FiMapPin, FiClock, FiMusic, FiPlay, FiPause } from 'react-icons/fi'
 
 const navItems = [
   { label: 'About', href: '#about' },
@@ -20,6 +20,109 @@ const mobileNavItems = [
 export default function Navbar({ theme, toggleTheme }) {
   const [scrolled, setScrolled] = useState(false)
   const [activeSection, setActiveSection] = useState('')
+  const [istTime, setIstTime] = useState('')
+  const [isPlaying505, setIsPlaying505] = useState(false)
+  const audioRef = useRef(null)
+
+  useEffect(() => {
+    // 505 by Arctic Monkeys audio element
+    const audio = new Audio('https://archive.org/download/arctic-monkeys-fwn-mp3/12%20505.mp3')
+    audio.loop = true
+    audio.volume = 0.55
+    audioRef.current = audio
+
+    // Restore saved audio playback position
+    const savedTime = localStorage.getItem('505_audio_time')
+    if (savedTime) {
+      audio.currentTime = parseFloat(savedTime) || 0
+    }
+
+    // Save currentTime periodically
+    const handleTimeUpdate = () => {
+      if (audio.currentTime > 0) {
+        localStorage.setItem('505_audio_time', audio.currentTime.toString())
+      }
+    }
+    audio.addEventListener('timeupdate', handleTimeUpdate)
+
+    // Check if audio was playing prior to reload
+    const wasPlaying = localStorage.getItem('505_audio_playing') === 'true'
+    if (wasPlaying) {
+      audio.play().then(() => {
+        setIsPlaying505(true)
+      }).catch(err => {
+        console.log('Autoplay on reload waiting for user interaction:', err)
+        const resumeOnClick = () => {
+          if (audioRef.current && localStorage.getItem('505_audio_playing') === 'true') {
+            audioRef.current.play().then(() => setIsPlaying505(true)).catch(() => {})
+          }
+          window.removeEventListener('click', resumeOnClick)
+        }
+        window.addEventListener('click', resumeOnClick, { once: true })
+      })
+    }
+
+    audio.onpause = () => {
+      setIsPlaying505(false)
+      localStorage.setItem('505_audio_playing', 'false')
+    }
+    audio.onended = () => {
+      setIsPlaying505(false)
+      localStorage.setItem('505_audio_playing', 'false')
+    }
+
+    const handleTriggerPlay = () => {
+      if (audioRef.current) {
+        audioRef.current.play().then(() => {
+          setIsPlaying505(true)
+          localStorage.setItem('505_audio_playing', 'true')
+        }).catch(err => console.error('505 play error:', err))
+      }
+    }
+    window.addEventListener('play-505-audio', handleTriggerPlay)
+
+    return () => {
+      if (audioRef.current) {
+        audioRef.current.removeEventListener('timeupdate', handleTimeUpdate)
+        audioRef.current.pause()
+        audioRef.current = null
+      }
+      window.removeEventListener('play-505-audio', handleTriggerPlay)
+    }
+  }, [])
+
+  const toggle505Audio = () => {
+    if (!audioRef.current) return
+    if (isPlaying505) {
+      audioRef.current.pause()
+      setIsPlaying505(false)
+      localStorage.setItem('505_audio_playing', 'false')
+    } else {
+      audioRef.current.play().then(() => {
+        setIsPlaying505(true)
+        localStorage.setItem('505_audio_playing', 'true')
+      }).catch(err => {
+        console.error('505 playback error:', err)
+      })
+    }
+  }
+
+  // Live IST Clock with Seconds
+  useEffect(() => {
+    const updateTime = () => {
+      const timeStr = new Date().toLocaleTimeString('en-US', {
+        timeZone: 'Asia/Kolkata',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: true
+      })
+      setIstTime(timeStr)
+    }
+    updateTime()
+    const timer = setInterval(updateTime, 1000)
+    return () => clearInterval(timer)
+  }, [])
 
   useEffect(() => {
     const onScroll = () => {
@@ -49,6 +152,44 @@ export default function Navbar({ theme, toggleTheme }) {
       <a href="#" className="brand-monogram" onClick={e => handleNavClick(e, '#hero')} aria-label="Home">
         ayushh<span className="accent">.</span>tech
       </a>
+
+      {/* Top Header Status Strip (Location, Live IST Clock, 505 Music Control) */}
+      <div className="top-status-header">
+        <div className="status-item location-item" title="Based in New Delhi, India">
+          <span className="location-pulse-dot" />
+          <FiMapPin className="status-icon" />
+          <span>New Delhi</span>
+        </div>
+
+        <div className="status-item time-item" title="Indian Standard Time (IST)">
+          <FiClock className="status-icon clock-ticking-icon" />
+          <span className="time-display-text">{istTime || '02:58:00 PM'}</span>
+          <span className="ist-tag">IST</span>
+        </div>
+
+        <button
+          className={`status-item music-item ${isPlaying505 ? 'playing' : ''}`}
+          onClick={toggle505Audio}
+          title={isPlaying505 ? 'Pause 505 — Arctic Monkeys' : 'Play 505 — Arctic Monkeys in background'}
+          aria-label="Toggle background music 505"
+        >
+          {isPlaying505 ? (
+            <>
+              <div className="bg-music-eq active">
+                <span /><span /><span /><span />
+              </div>
+              <span className="music-title">505</span>
+              <FiPause className="music-action-icon" />
+            </>
+          ) : (
+            <>
+              <FiMusic className="status-icon music-idle-icon" />
+              <span className="music-title">505</span>
+              <FiPlay className="music-action-icon" />
+            </>
+          )}
+        </button>
+      </div>
 
       {/* Desktop top navbar */}
       <nav className={`navbar ${scrolled ? 'scrolled' : ''}`} id="navbar">

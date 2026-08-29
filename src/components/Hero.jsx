@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
-import { motion, useScroll, useTransform } from 'framer-motion'
+import { motion, useScroll, useTransform, AnimatePresence } from 'framer-motion'
 import { FiArrowRight, FiExternalLink } from 'react-icons/fi'
+import SpotifyNowPlaying from './SpotifyNowPlaying'
 
 const roles = ['Developer', 'Builder', 'Problem Solver', 'Creator', 'Innovator']
 
@@ -72,8 +73,11 @@ export default function Hero() {
   useEffect(() => {
     const canvas = particlesCanvasRef.current
     if (!canvas) return
+    // Respect reduced-motion: skip the particle animation entirely
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
     const ctx = canvas.getContext('2d')
     let animationFrameId
+    let running = false
 
     let width = canvas.width = canvas.parentElement.clientWidth
     let height = canvas.height = canvas.parentElement.clientHeight
@@ -155,6 +159,7 @@ export default function Hero() {
 
     // Loop
     const draw = () => {
+      if (!running) return
       ctx.clearRect(0, 0, width, height)
 
       // Update and draw particles
@@ -188,12 +193,30 @@ export default function Hero() {
       animationFrameId = requestAnimationFrame(draw)
     }
 
-    draw()
+    const start = () => {
+      if (running) return
+      running = true
+      animationFrameId = requestAnimationFrame(draw)
+    }
+
+    const stop = () => {
+      running = false
+      if (animationFrameId) cancelAnimationFrame(animationFrameId)
+    }
+
+    // Only animate while the hero is on-screen
+    const io = new IntersectionObserver(
+      ([entry]) => (entry.isIntersecting ? start() : stop()),
+      { threshold: 0 }
+    )
+    io.observe(canvas.parentElement)
 
     return () => {
-      cancelAnimationFrame(animationFrameId)
+      stop()
+      io.disconnect()
       window.removeEventListener('mousemove', handleMouseMove)
       window.removeEventListener('resize', handleResize)
+      canvas.parentElement.removeEventListener('mouseleave', handleMouseLeave)
     }
   }, [])
 
@@ -288,6 +311,16 @@ export default function Hero() {
           >
             <FiExternalLink /> Resume
           </motion.a>
+        </motion.div>
+
+        {/* Spotify Now Playing — compact pill */}
+        <motion.div
+          initial={{ opacity: 0, y: 15 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 1.2, duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+          style={{ marginTop: '32px' }}
+        >
+          <SpotifyNowPlaying />
         </motion.div>
       </motion.div>
 

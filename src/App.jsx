@@ -25,7 +25,7 @@ function App() {
   const [showSurprise, setShowSurprise] = useState(false)
   const [loading, setLoading] = useState(true)
 
-  // Prevent scroll during loading phase
+  // Prevent scroll during loading phase & restore scroll position after loader
   useEffect(() => {
     if (loading) {
       document.body.style.overflow = 'hidden'
@@ -33,12 +33,31 @@ function App() {
     } else {
       document.body.style.overflow = ''
       document.documentElement.style.overflow = ''
+      // Restore scroll position after camera loader completes
+      const savedY = sessionStorage.getItem('portfolio_scroll_y')
+      if (savedY) {
+        const targetY = parseFloat(savedY)
+        if (!isNaN(targetY) && targetY > 0) {
+          window.scrollTo({ top: targetY, behavior: 'instant' })
+        }
+      }
     }
     return () => {
       document.body.style.overflow = ''
       document.documentElement.style.overflow = ''
     }
   }, [loading])
+
+  // Continually save current scroll position for reload restoration
+  useEffect(() => {
+    const saveScroll = () => {
+      if (window.scrollY > 0) {
+        sessionStorage.setItem('portfolio_scroll_y', window.scrollY.toString())
+      }
+    }
+    window.addEventListener('scroll', saveScroll, { passive: true })
+    return () => window.removeEventListener('scroll', saveScroll)
+  }, [])
 
   // Keyboard sequence listener for "rick"
   useEffect(() => {
