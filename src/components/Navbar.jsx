@@ -54,7 +54,7 @@ export default function Navbar({ theme, toggleTheme }) {
         console.log('Autoplay on reload waiting for user interaction:', err)
         const resumeOnClick = () => {
           if (audioRef.current && localStorage.getItem('505_audio_playing') === 'true') {
-            audioRef.current.play().then(() => setIsPlaying505(true)).catch(() => {})
+            audioRef.current.play().then(() => setIsPlaying505(true)).catch(() => { })
           }
           window.removeEventListener('click', resumeOnClick)
         }
@@ -266,7 +266,7 @@ export default function Navbar({ theme, toggleTheme }) {
       <nav className="mobile-bottom-nav" aria-label="Mobile navigation">
         {mobileNavItems.map(item => {
           const Icon = item.icon
-          const isActive = activeSection === item.href.slice(1) || 
+          const isActive = activeSection === item.href.slice(1) ||
             (item.href === '#hero' && !activeSection)
           return (
             <a
