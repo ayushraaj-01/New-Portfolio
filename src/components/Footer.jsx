@@ -1,12 +1,21 @@
-import { FiGithub, FiLinkedin } from 'react-icons/fi'
+import { FiGithub, FiLinkedin, FiArrowUp } from 'react-icons/fi'
 import { FaXTwitter, FaDiscord } from 'react-icons/fa6'
 
 export default function Footer({ onTriggerSurprise }) {
   const year = new Date().getFullYear()
 
+  const scrollToTop = () => {
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    window.scrollTo({ top: 0, behavior: reduced ? 'auto' : 'smooth' })
+  }
+
   return (
     <footer className="footer">
       <div className="container">
+        <button type="button" className="footer-top-btn" onClick={scrollToTop}>
+          <FiArrowUp aria-hidden="true" />
+          Back to top
+        </button>
         <div className="footer-content">
           <p>
             Built by <span style={{ color: 'var(--accent)', fontWeight: 600 }}>Ayush Raj</span> © {year}
