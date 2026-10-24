@@ -4,20 +4,20 @@ import { AnimatedSectionHeader } from './animations'
 
 const initialNodes = [
   // Core category nodes (Beige)
-  { id: 'Backend Core', label: 'Backend Core', color: '#f5efe6', size: 20, isCore: true },
-  { id: 'Frontend Core', label: 'Frontend Core', color: '#f5efe6', size: 20, isCore: true },
-  { id: 'Language Core', label: 'Language Core', color: '#f5efe6', size: 20, isCore: true },
-  { id: 'Tooling Core', label: 'Tooling Core', color: '#f5efe6', size: 20, isCore: true },
+  { id: 'Backend Core', label: 'Backend Core', color: '#f7f3ea', size: 20, isCore: true },
+  { id: 'Frontend Core', label: 'Frontend Core', color: '#f7f3ea', size: 20, isCore: true },
+  { id: 'Language Core', label: 'Language Core', color: '#f7f3ea', size: 20, isCore: true },
+  { id: 'Tooling Core', label: 'Tooling Core', color: '#f7f3ea', size: 20, isCore: true },
 
   // Backend (connected to Backend Core) -> Neon Lime
-  { id: 'Node.js', label: 'Node.js', color: '#ccff00', size: 13 },
-  { id: 'Express', label: 'Express', color: '#ccff00', size: 13 },
-  { id: 'MySQL', label: 'MySQL', color: '#ccff00', size: 13 },
-  { id: 'MongoDB', label: 'MongoDB', color: '#ccff00', size: 13 },
-  { id: 'REST APIs', label: 'REST APIs', color: '#ccff00', size: 13 },
-  { id: 'JWT', label: 'JWT', color: '#ccff00', size: 13 },
-  { id: 'Socket.io', label: 'Socket.io', color: '#ccff00', size: 13 },
-  { id: 'Go', label: 'Go', color: '#ccff00', size: 13 },
+  { id: 'Node.js', label: 'Node.js', color: '#fbbf24', size: 13 },
+  { id: 'Express', label: 'Express', color: '#fbbf24', size: 13 },
+  { id: 'MySQL', label: 'MySQL', color: '#fbbf24', size: 13 },
+  { id: 'MongoDB', label: 'MongoDB', color: '#fbbf24', size: 13 },
+  { id: 'REST APIs', label: 'REST APIs', color: '#fbbf24', size: 13 },
+  { id: 'JWT', label: 'JWT', color: '#fbbf24', size: 13 },
+  { id: 'Socket.io', label: 'Socket.io', color: '#fbbf24', size: 13 },
+  { id: 'Go', label: 'Go', color: '#fbbf24', size: 13 },
 
   // Frontend (connected to Frontend Core) -> Warm Beige
   { id: 'React', label: 'React', color: '#e5d9c5', size: 13 },
@@ -27,10 +27,10 @@ const initialNodes = [
   { id: 'JavaScript', label: 'JavaScript', color: '#e5d9c5', size: 13 },
 
   // Languages & Algorithms (connected to Language Core) -> Electric Lime
-  { id: 'Python', label: 'Python', color: '#a3e635', size: 13 },
-  { id: 'C', label: 'C', color: '#a3e635', size: 13 },
-  { id: 'C++', label: 'C++', color: '#a3e635', size: 13 },
-  { id: 'Java', label: 'Java', color: '#a3e635', size: 13 },
+  { id: 'Python', label: 'Python', color: '#fde68a', size: 13 },
+  { id: 'C', label: 'C', color: '#fde68a', size: 13 },
+  { id: 'C++', label: 'C++', color: '#fde68a', size: 13 },
+  { id: 'Java', label: 'Java', color: '#fde68a', size: 13 },
 
   // Tools & DevOps (connected to Tooling Core) -> Soft Muted Beige
   { id: 'Git', label: 'Git', color: '#d4c5b2', size: 13 },
