@@ -1,25 +1,33 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, lazy, Suspense } from 'react'
 import { motion, useScroll, useSpring } from 'framer-motion'
 import Navbar from './components/Navbar'
 import Hero from './components/Hero'
-import About from './components/About'
-import Skills from './components/Skills'
-import Projects from './components/Projects'
-import Certifications from './components/Certifications'
-import Contact from './components/Contact'
-import Footer from './components/Footer'
 import CursorDot from './components/CursorDot'
+import BackToTop from './components/BackToTop'
 import { SectionDivider } from './components/animations'
 import CameraLoader from './components/CameraLoader'
+import Nameplate from './components/Nameplate'
+
+// Below-the-fold sections are code-split so the first paint only ships the hero.
+const About = lazy(() => import('./components/About'))
+const Skills = lazy(() => import('./components/Skills'))
+const Projects = lazy(() => import('./components/Projects'))
+const Certifications = lazy(() => import('./components/Certifications'))
+const Contact = lazy(() => import('./components/Contact'))
+const Footer = lazy(() => import('./components/Footer'))
+
+function SectionFallback() {
+  return <div className="section-fallback" aria-hidden="true" />
+}
 
 const sections = ['hero', 'about', 'skills', 'projects', 'certifications', 'contact']
 
 function App() {
   const [theme, setTheme] = useState(() => {
     if (typeof window !== 'undefined') {
-      return localStorage.getItem('portfolio-theme') || 'dark'
+      return localStorage.getItem('portfolio-theme') || 'light'
     }
-    return 'dark'
+    return 'light'
   })
   const [activeSection, setActiveSection] = useState('hero')
   const [showSurprise, setShowSurprise] = useState(false)
@@ -48,15 +56,76 @@ function App() {
     }
   }, [loading])
 
-  // Continually save current scroll position for reload restoration
+  // Single rAF-throttled scroll pipeline: HUD active section + scroll-position save.
+  // (Replaces two separate scroll listeners that ran layout reads and storage
+  // writes on every scroll event.)
   useEffect(() => {
-    const saveScroll = () => {
-      if (window.scrollY > 0) {
-        sessionStorage.setItem('portfolio_scroll_y', window.scrollY.toString())
+    let rafId = null
+    let lastSave = 0
+    let sectionEls = []
+
+    const getSectionEls = () => {
+      // Re-scan while lazy-loaded sections are still mounting
+      if (sectionEls.length !== sections.length) {
+        sectionEls = sections.map((id) => document.getElementById(id)).filter(Boolean)
+      }
+      return sectionEls
+    }
+
+    const processScroll = () => {
+      rafId = null
+      const scrollY = window.scrollY
+
+      // --- HUD active section ---
+      if (scrollY < 120) {
+        setActiveSection((prev) => (prev === 'hero' ? prev : 'hero'))
+      } else {
+        const els = getSectionEls()
+        for (let i = els.length - 1; i >= 0; i--) {
+          const rect = els[i].getBoundingClientRect()
+          // If the top of the section is within 250px of viewport top
+          if (rect.top <= 250) {
+            const id = els[i].id
+            setActiveSection((prev) => (prev === id ? prev : id))
+            break
+          }
+        }
+      }
+
+      // --- Persist scroll position for reload restoration (max 1/sec) ---
+      const now = performance.now()
+      if (scrollY > 0 && now - lastSave > 1000) {
+        lastSave = now
+        try {
+          sessionStorage.setItem('portfolio_scroll_y', scrollY.toString())
+        } catch {
+          /* storage may be full/blocked */
+        }
       }
     }
-    window.addEventListener('scroll', saveScroll, { passive: true })
-    return () => window.removeEventListener('scroll', saveScroll)
+
+    const onScroll = () => {
+      if (rafId === null) rafId = requestAnimationFrame(processScroll)
+    }
+
+    const saveFinal = () => {
+      try {
+        sessionStorage.setItem('portfolio_scroll_y', window.scrollY.toString())
+      } catch {
+        /* storage may be full/blocked */
+      }
+    }
+
+    processScroll()
+    window.addEventListener('scroll', onScroll, { passive: true })
+    window.addEventListener('pagehide', saveFinal)
+    document.addEventListener('visibilitychange', saveFinal)
+    return () => {
+      window.removeEventListener('scroll', onScroll)
+      window.removeEventListener('pagehide', saveFinal)
+      document.removeEventListener('visibilitychange', saveFinal)
+      if (rafId !== null) cancelAnimationFrame(rafId)
+    }
   }, [])
 
   // Keyboard sequence listener for "rick"
@@ -132,32 +201,8 @@ function App() {
     document.documentElement.setAttribute('data-theme', theme)
   }, [theme])
 
-  // Track active section for sidebar HUD indicator
-  useEffect(() => {
-    const handleScrollHUD = () => {
-      const scrollY = window.scrollY
-
-      // If we are near the top of the viewport
-      if (scrollY < 120) {
-        setActiveSection('hero')
-        return
-      }
-
-      for (let i = sections.length - 1; i >= 0; i--) {
-        const el = document.getElementById(sections[i])
-        if (el) {
-          const rect = el.getBoundingClientRect()
-          // If the top of the section is within 250px of viewport top
-          if (rect.top <= 250) {
-            setActiveSection(sections[i])
-            break
-          }
-        }
-      }
-    }
-    window.addEventListener('scroll', handleScrollHUD, { passive: true })
-    return () => window.removeEventListener('scroll', handleScrollHUD)
-  }, [])
+  // Track active section for sidebar HUD indicator handled by the merged
+  // rAF-throttled scroll pipeline above.
 
   const { scrollYProgress } = useScroll()
   const scaleX = useSpring(scrollYProgress, { stiffness: 100, damping: 30, restDelta: 0.001 })
@@ -166,6 +211,7 @@ function App() {
     <>
       {loading && <CameraLoader onComplete={() => setLoading(false)} />}
       <CursorDot />
+      <BackToTop />
 
       {/* Progress bar */}
       <motion.div
@@ -183,8 +229,16 @@ function App() {
       />
 
       {/* Desktop Sidebar HUD Progress Tracker */}
-      <div className="sidebar-hud">
+      <div
+        className="sidebar-hud"
+        style={{
+          '--hud-progress': String(
+            Math.max(0, sections.indexOf(activeSection)) / (sections.length - 1)
+          ),
+        }}
+      >
         <div className="hud-line-bg" />
+        <div className="hud-line-fill" />
         <div className="hud-dots">
           {sections.map((section) => (
             <a
@@ -197,6 +251,7 @@ function App() {
                 if (el) el.scrollIntoView({ behavior: 'smooth' })
               }}
               aria-label={`Scroll to ${section}`}
+              aria-current={activeSection === section ? 'true' : undefined}
             >
               <div className="hud-dot" />
               <span className="hud-label">{section}</span>
@@ -224,22 +279,36 @@ function App() {
         </div>
 
         <SectionDivider />
-        <About />
+        <Suspense fallback={<SectionFallback />}>
+          <About />
+        </Suspense>
 
         <SectionDivider />
-        <Skills />
+        <Suspense fallback={<SectionFallback />}>
+          <Skills />
+        </Suspense>
 
         <SectionDivider />
-        <Projects />
+        <Suspense fallback={<SectionFallback />}>
+          <Projects />
+        </Suspense>
 
         <SectionDivider />
-        <Certifications />
+        <Suspense fallback={<SectionFallback />}>
+          <Certifications />
+        </Suspense>
 
         <SectionDivider />
-        <Contact onTriggerSurprise={() => setShowSurprise(true)} />
+        <Suspense fallback={<SectionFallback />}>
+          <Contact onTriggerSurprise={() => setShowSurprise(true)} />
+        </Suspense>
+
+        <Nameplate />
       </main>
 
-      <Footer onTriggerSurprise={() => setShowSurprise(true)} />
+      <Suspense fallback={null}>
+        <Footer onTriggerSurprise={() => setShowSurprise(true)} />
+      </Suspense>
 
       {showSurprise && (
         <div className="surprise-modal-overlay" onClick={() => setShowSurprise(false)}>
