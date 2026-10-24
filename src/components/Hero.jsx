@@ -1,9 +1,34 @@
 import { useState, useEffect, useRef } from 'react'
-import { motion, useScroll, useTransform, AnimatePresence } from 'framer-motion'
+import {
+  motion, useScroll, useTransform, useMotionValue, useSpring, useMotionTemplate,
+} from 'framer-motion'
 import { FiArrowRight, FiExternalLink } from 'react-icons/fi'
 import SpotifyNowPlaying from './SpotifyNowPlaying'
 
 const roles = ['Developer', 'Builder', 'Problem Solver', 'Creator', 'Innovator']
+
+const heroWords = [
+  { text: 'Hi,' },
+  { text: "I'm" },
+  { text: 'Ayush', accent: true },
+  { text: 'Raj', accent: true },
+]
+
+/* Cinematic word-by-word mask reveal for the headline */
+const heroWordVariants = {
+  hidden: { y: '115%', rotateX: -55, opacity: 0 },
+  visible: (i) => ({
+    y: '0%',
+    rotateX: 0,
+    opacity: 1,
+    transition: {
+      duration: 0.75,
+      delay: 0.3 + i * 0.11,
+      ease: [0.22, 1, 0.36, 1],
+      opacity: { duration: 0.5, delay: 0.3 + i * 0.11 },
+    },
+  }),
+}
 
 function useTypewriter(words, typingSpeed = 100, deletingSpeed = 60, pauseTime = 2000) {
   const [text, setText] = useState('')
@@ -55,6 +80,30 @@ export default function Hero() {
   const contentOpacity = useTransform(scrollYProgress, [0, 0.6], [1, 0])
   const contentScale = useTransform(scrollYProgress, [0, 0.6], [1, 0.9])
 
+  // Medium-intensity pointer motion: content sways gently, spotlight follows cursor,
+  // particle layer drifts on its own parallax depth
+  const prefersReducedMotion = typeof window !== 'undefined' &&
+    window.matchMedia('(prefers-reduced-motion: reduce)').matches
+
+  const pointerX = useMotionValue(0)
+  const pointerY = useMotionValue(0)
+  const spotX = useSpring(pointerX, { stiffness: 60, damping: 20, mass: 0.5 })
+  const spotY = useSpring(pointerY, { stiffness: 60, damping: 20, mass: 0.5 })
+  const contentX = useTransform(pointerX, [-1, 1], [-8, 8])
+  const particlesY = useTransform(scrollYProgress, [0, 1], [0, -60])
+
+  const spotlightBg = useMotionTemplate
+    `radial-gradient(560px circle at ${spotX}px ${spotY}px, rgba(var(--accent-rgb), 0.16), transparent 65%)`
+
+  const handlePointerMove = (e) => {
+    if (prefersReducedMotion || !heroRef.current) return
+    const rect = heroRef.current.getBoundingClientRect()
+    pointerX.set(((e.clientX - rect.left) / rect.width) * 2 - 1)
+    pointerY.set(((e.clientY - rect.top) / rect.height) * 2 - 1)
+    spotX.set(e.clientX - rect.left)
+    spotY.set(e.clientY - rect.top)
+  }
+
   const isSafariOrIOS = typeof window !== 'undefined' &&
     (/iPad|iPhone|iPod/.test(navigator.userAgent) || /^((?!chrome|android).)*safari/i.test(navigator.userAgent))
 
@@ -90,7 +139,7 @@ export default function Hero() {
     // Colors matching theme
     const getAccentColor = () => {
       const theme = document.documentElement.getAttribute('data-theme')
-      return theme === 'light' ? 'rgba(88, 124, 0, ' : 'rgba(204, 255, 0, '
+      return theme === 'light' ? 'rgba(180, 83, 9, ' : 'rgba(251, 191, 36, '
     }
 
     class Particle {
@@ -221,25 +270,31 @@ export default function Hero() {
   }, [])
 
   return (
-    <section className="hero" id="hero" ref={heroRef}>
+    <section className="hero" id="hero" ref={heroRef} onMouseMove={handlePointerMove}>
       {/* Noise overlay */}
       <div className="hero-noise" />
 
       {/* Grid overlay */}
       <div className="hero-grid" />
 
+      {/* Cursor-following spotlight glow */}
+      <motion.div className="hero-spotlight" style={{ background: spotlightBg }} aria-hidden="true" />
+
       {/* Interactive floating particles canvas */}
-      <canvas ref={particlesCanvasRef} className="hero-particles-canvas" />
+      <motion.canvas ref={particlesCanvasRef} className="hero-particles-canvas" style={{ y: particlesY }} />
 
       {/* Animated gradient blobs with parallax */}
       <motion.div className="hero-blob hero-blob-1" style={{ y: blob1Y }} />
       <motion.div className="hero-blob hero-blob-2" style={{ y: blob2Y }} />
       <motion.div className="hero-blob hero-blob-3" style={{ y: blob3Y }} />
 
+
+
       <motion.div
         className="hero-content"
         style={{
           y: contentY,
+          x: contentX,
           opacity: contentOpacity,
           scale: contentScale,
           filter: filterString,
@@ -249,29 +304,38 @@ export default function Hero() {
           className="hero-badge"
           initial={{ opacity: 0, scale: 0.9, y: 20 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
-          transition={{ delay: 0.3, duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+          transition={{ delay: 0.2, duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
         >
           <span className="dot" />
           Available for opportunities
         </motion.div>
 
+        {/* Word-by-word cinematic reveal; name words carry a slow maroon shimmer */}
         <motion.h1
           className="hero-name"
-          initial={{ opacity: 0, y: 30, filter: isSafariOrIOS ? 'none' : 'blur(8px)' }}
-          animate={{ opacity: 1, y: 0, filter: isSafariOrIOS ? 'none' : 'blur(0px)' }}
-          transition={{ delay: 0.4, duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+          aria-label="Hi, I'm Ayush Raj"
+          initial="hidden"
+          animate="visible"
         >
-          Hi, I'm{' '}
-          <span className="gradient-text">
-            Ayush Raj
-          </span>
+          {heroWords.map((word, i) => (
+            <span key={word.text} className="hero-word-mask" aria-hidden="true">
+              <motion.span
+                className={`hero-word${word.accent ? ' gradient-text' : ''}`}
+                data-word={word.text}
+                custom={i}
+                variants={heroWordVariants}
+              >
+                {word.text}
+              </motion.span>
+            </span>
+          ))}
         </motion.h1>
 
         <motion.p
           className="hero-tagline"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.6, duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+          transition={{ delay: 0.85, duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
         >
           Full-Stack Developer
         </motion.p>
@@ -280,7 +344,7 @@ export default function Hero() {
           className="hero-typewriter"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 0.8, duration: 0.6 }}
+          transition={{ delay: 1, duration: 0.6 }}
         >
           I'm a <span className="typed-text">{typedText}</span>
           <span className="cursor" />
@@ -290,7 +354,7 @@ export default function Hero() {
           className="hero-buttons"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 1, duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+          transition={{ delay: 1.15, duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
         >
           <motion.a
             href="#projects"
@@ -313,11 +377,11 @@ export default function Hero() {
           </motion.a>
         </motion.div>
 
-        {/* Spotify Now Playing — compact pill */}
+        {/* Spotify Now Playing — equalizer card */}
         <motion.div
           initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 1.2, duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+          transition={{ delay: 1.35, duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
           style={{ marginTop: '32px' }}
         >
           <SpotifyNowPlaying />
@@ -328,7 +392,7 @@ export default function Hero() {
         className="hero-scroll-indicator"
         initial={{ opacity: 0, y: 15 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 1.4, duration: 0.6 }}
+        transition={{ delay: 1.55, duration: 0.6 }}
         style={{ opacity: contentOpacity }}
       >
         <div className="scroll-indicator-cool">
