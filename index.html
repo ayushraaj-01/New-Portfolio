@@ -4,6 +4,8 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" media="prefers-color-scheme: dark" content="#131110" />
+    <meta name="theme-color" media="prefers-color-scheme: light" content="#fdfcf9" />
     <meta name="description" content="Full-Stack Developer portfolio — building modern, scalable web applications with React, Node.js, and cloud technologies." />
     <meta name="keywords" content="Full-Stack Developer, React, Node.js, Portfolio, Web Developer" />
     <meta name="author" content="Ayush Raj" />
@@ -22,9 +24,26 @@
     <title>Ayush Raj — Full-Stack Developer</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+    <!-- Structured data for search engines / rich results -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "Person",
+        "name": "Ayush Raj",
+        "jobTitle": "Full-Stack Developer",
+        "url": "https://new-portfolio-woad-chi-25.vercel.app/",
+        "image": "https://new-portfolio-woad-chi-25.vercel.app/profile.jpg",
+        "sameAs": [
+          "https://github.com/",
+          "https://www.linkedin.com/"
+        ]
+      }
+    </script>
   </head>
   <body>
+    <a class="skip-link" href="#hero">Skip to content</a>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
   </body>
