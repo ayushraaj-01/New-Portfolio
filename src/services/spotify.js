@@ -13,12 +13,39 @@ const SPOTIFY_CLIENT_SECRET = import.meta.env.VITE_SPOTIFY_CLIENT_SECRET || ""
 const SPOTIFY_REFRESH_TOKEN = import.meta.env.VITE_SPOTIFY_REFRESH_TOKEN || ""
 
 const CACHE_KEY = "sp_last_played"
+const PREV_KEY = "sp_prev_track"
 
-/** Save a live track to localStorage so we can show it when offline */
+// How often the live playback is polled while the tab is visible.
+export const SPOTIFY_POLL_MS = 2500
+
+/** True when the build has app credentials, so the Spotify Web API can be polled directly. */
+export const HAS_SPOTIFY_APP_CREDS = Boolean(
+  SPOTIFY_CLIENT_ID && SPOTIFY_CLIENT_SECRET && SPOTIFY_REFRESH_TOKEN
+)
+
+// Access tokens live for an hour — reuse one across polls instead of asking for a
+// new token every 6 seconds.
+let tokenCache = { token: null, expiresAt: 0 }
+
+/** Save a live track to localStorage, keeping the outgoing one as "last listened" */
 function cacheLastPlayed(track) {
   try {
+    const previous = getLastPlayed()
+    if (previous?.trackId && previous.trackId !== track.trackId) {
+      localStorage.setItem(PREV_KEY, JSON.stringify(previous))
+    }
     localStorage.setItem(CACHE_KEY, JSON.stringify(track))
   } catch (_) {}
+}
+
+/** The track that was playing before the current one */
+export function getPreviousTrack() {
+  try {
+    const raw = localStorage.getItem(PREV_KEY)
+    return raw ? JSON.parse(raw) : null
+  } catch (_) {
+    return null
+  }
 }
 
 /** Read last played track from localStorage */
@@ -35,7 +62,10 @@ export function getLastPlayed() {
  * Gets a fresh Spotify API Access Token using OAuth Refresh Token.
  */
 async function getSpotifyAccessToken() {
-  if (!SPOTIFY_CLIENT_ID || !SPOTIFY_CLIENT_SECRET || !SPOTIFY_REFRESH_TOKEN) return null
+  if (!HAS_SPOTIFY_APP_CREDS) return null
+
+  const now = Date.now()
+  if (tokenCache.token && now < tokenCache.expiresAt) return tokenCache.token
 
   try {
     const basic = btoa(`${SPOTIFY_CLIENT_ID}:${SPOTIFY_CLIENT_SECRET}`)
@@ -53,10 +83,35 @@ async function getSpotifyAccessToken() {
 
     if (!res.ok) return null
     const data = await res.json()
-    return data.access_token
+    if (!data.access_token) return null
+
+    tokenCache = {
+      token: data.access_token,
+      // Renew a minute early so a poll never races the expiry.
+      expiresAt: now + Math.max(60, (data.expires_in || 3600) - 60) * 1000,
+    }
+    return tokenCache.token
   } catch (e) {
     console.warn("Spotify token fetch failed:", e)
     return null
+  }
+}
+
+/**
+ * Normalises a Spotify track (or podcast episode) into the shape the UI expects.
+ */
+function toTrack(item) {
+  const isEpisode = item.type === 'episode'
+  return {
+    title: item.name,
+    artist: isEpisode
+      ? item.show?.name || ''
+      : item.artists?.map((a) => a.name).join(', ') || '',
+    album: isEpisode ? item.show?.name || '' : item.album?.name || '',
+    albumArt: (isEpisode ? item.images?.[0]?.url : item.album?.images?.[0]?.url) || null,
+    spotifyUrl: item.external_urls?.spotify || null,
+    trackId: item.id,
+    kind: isEpisode ? 'episode' : 'track',
   }
 }
 
@@ -76,15 +131,7 @@ async function fetchDirectSpotifyAPI() {
     if (nowRes.status === 200) {
       const nowData = await nowRes.json()
       if (nowData.is_playing && nowData.item) {
-        const item = nowData.item
-        const track = {
-          title: item.name,
-          artist: item.artists.map((a) => a.name).join(", "),
-          album: item.album.name,
-          albumArt: item.album.images[0]?.url,
-          spotifyUrl: item.external_urls.spotify,
-          trackId: item.id,
-        }
+        const track = toTrack(nowData.item)
         cacheLastPlayed(track)
         return { isLive: true, isLastPlayed: false, track }
       }
@@ -99,14 +146,7 @@ async function fetchDirectSpotifyAPI() {
       const recentData = await recentRes.json()
       const item = recentData.items[0]?.track
       if (item) {
-        const track = {
-          title: item.name,
-          artist: item.artists.map((a) => a.name).join(", "),
-          album: item.album.name,
-          albumArt: item.album.images[0]?.url,
-          spotifyUrl: item.external_urls.spotify,
-          trackId: item.id,
-        }
+        const track = toTrack(item)
         cacheLastPlayed(track)
         return { isLive: false, isLastPlayed: true, track }
       }
