@@ -98,9 +98,9 @@ export default function CameraLoader({ onComplete }) {
 
                 {/* Glass reflection glow */}
                 <radialGradient id="glass-glow" cx="30%" cy="30%" r="70%">
-                  <stop offset="0%" stopColor="rgba(251, 191, 36, 0.18)" />
+                  <stop offset="0%" stopColor="rgba(243, 238, 228, 0.18)" />
                   <stop offset="35%" stopColor="rgba(245, 239, 230, 0.08)" />
-                  <stop offset="70%" stopColor="rgba(251, 191, 36, 0.02)" />
+                  <stop offset="70%" stopColor="rgba(243, 238, 228, 0.02)" />
                   <stop offset="100%" stopColor="rgba(0,0,0,0)" />
                 </radialGradient>
 
@@ -214,7 +214,7 @@ export default function CameraLoader({ onComplete }) {
               <path
                 d="M 220,420 A 170,170 0 0,1 380,420"
                 fill="none"
-                stroke="rgba(251, 191, 36, 0.08)"
+                stroke="rgba(243, 238, 228, 0.08)"
                 strokeWidth="1.5"
                 strokeLinecap="round"
                 pointerEvents="none"
