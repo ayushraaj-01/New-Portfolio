@@ -1,9 +1,46 @@
 import { useCallback, useEffect, useRef } from 'react'
+import { playFall, playLand } from '../services/fallSound'
 
 const TEXT = 'AYUSH RAJ'
 const MAX_PARTICLES = 4200
 const GRAVITY = 1500
 const RESTITUTION = 0.45
+
+// The name is built out of micro letters (a, b, c …) rather than squares.
+// Only x-height letters: no ascenders, descenders or dots, so every glyph sits
+// on the same baseline and the name reads cleanly instead of looking like a
+// ransom note.
+const GLYPHS = 'acemnorsuvwxz'
+
+// Hover bulge: letters inside this radius slide outward and swell, so the name
+// dents around the cursor like a lens.
+const BULGE_RADIUS = 96
+const BULGE_STRENGTH = 30
+
+/**
+ * Pre-renders every micro letter, in both ink colours, into small offscreen
+ * canvases. Tinting a glyph per particle would otherwise need a fillText call
+ * per particle per frame; drawImage from this atlas is far cheaper.
+ */
+function makeGlyphAtlas(cell, dpr, family, colors) {
+  const px = Math.max(4, Math.round(cell * dpr))
+  const build = (rgb) =>
+    GLYPHS.split('').map((char) => {
+      const glyph = document.createElement('canvas')
+      glyph.width = px
+      glyph.height = px
+      const g = glyph.getContext('2d')
+      g.font = `600 ${Math.round(px * 0.88)}px ${family}`
+      g.textAlign = 'center'
+      g.textBaseline = 'middle'
+      g.fillStyle = `rgb(${rgb})`
+      // Nudge down slightly — lowercase letters sit below the optical centre.
+      g.fillText(char, px / 2, px * 0.54)
+      return glyph
+    })
+
+  return { base: build(colors.base), accent: build(colors.accent) }
+}
 
 const reduceMotion = () =>
   typeof window !== 'undefined' &&
@@ -11,9 +48,10 @@ const reduceMotion = () =>
 
 /**
  * The nameplate from saiaryan.in, taken further: the name is drawn once to an
- * offscreen canvas, sampled into ~4k particles, and drawn as a bold name that
- * bursts into its own pieces when you click it — then pulls itself back
- * together. All state lives in refs; nothing re-renders per frame.
+ * offscreen canvas, sampled into ~4k particles, and drops in letter by letter.
+ * Click it and the letters simply let go and fall to the floor of the band —
+ * with a synthesised rustle and thud — then pull themselves back together.
+ * All state lives in refs; nothing re-renders per frame.
  */
 export default function Nameplate() {
   const canvasRef = useRef(null)
@@ -22,8 +60,10 @@ export default function Nameplate() {
   const modeRef = useRef('idle')
   const resetTimerRef = useRef(0)
   const resizeTimerRef = useRef(0)
-  const colorsRef = useRef({ base: '247, 243, 234', accent: '251, 191, 36' })
+  const colorsRef = useRef({ base: '243, 238, 228', accent: '201, 192, 174' })
+  const atlasRef = useRef({ cell: 0, base: null, accent: null })
   const sizeRef = useRef({ w: 0, h: 0, dpr: 1 })
+  const pointerRef = useRef({ x: 0, y: 0, active: false })
   const lastRef = useRef(0)
 
   const setMode = useCallback((mode) => {
@@ -43,8 +83,24 @@ export default function Nameplate() {
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
     ctx.clearRect(0, 0, sizeRef.current.w, sizeRef.current.h)
 
-    // Two passes so fillStyle is set twice per frame instead of per particle.
+    const atlas = atlasRef.current
+
+    // Two passes so the ink colour is resolved twice per frame, not per particle.
     for (const wantAccent of [false, true]) {
+      const glyphs = wantAccent ? atlas.accent : atlas.base
+
+      if (glyphs) {
+        for (const p of particles) {
+          if (p.accent !== wantAccent) continue
+          // Bulged letters grow a little, which reads as a lens over the name.
+          const size = atlas.cell * p.s
+          ctx.globalAlpha = p.alpha
+          ctx.drawImage(glyphs[p.gi], p.x - size / 2, p.y - size / 2, size, size)
+        }
+        continue
+      }
+
+      // Fallback (atlas not built yet): plain squares, as before.
       ctx.fillStyle = `rgb(${wantAccent ? accent : base})`
       for (const p of particles) {
         if (p.accent !== wantAccent) continue
@@ -73,54 +129,138 @@ export default function Nameplate() {
     const particles = particlesRef.current
     const mode = modeRef.current
 
-    if (mode === 'scatter') {
+    if (mode === 'fall') {
+      // Entrance: the letters drop in from above the band and each one lands on
+      // its own spot in the name. Pure gravity — nothing flies outward.
+      let landed = true
       for (const p of particles) {
+        if (p.resting) continue
+        landed = false
         p.vy += GRAVITY * dt
-        p.vx *= 0.995
-        p.x += p.vx * dt
         p.y += p.vy * dt
+        // Drift back over the slot on the way down so the name still reads.
+        p.x += (p.homeX - p.x) * Math.min(1, dt * 5)
 
-        if (p.y > h - p.size) {
-          p.y = h - p.size
-          p.vy = Math.abs(p.vy) > 60 ? -p.vy * RESTITUTION : 0
-          p.vx *= 0.82
-        }
-        if (p.x < 0) {
-          p.x = 0
-          p.vx = Math.abs(p.vx) * 0.35
-        } else if (p.x > w - p.size) {
-          p.x = w - p.size
-          p.vx = -Math.abs(p.vx) * 0.35
+        if (p.y >= p.homeY) {
+          p.y = p.homeY
+          p.x = p.homeX
+          if (Math.abs(p.vy) > 240) p.vy = -p.vy * 0.18
+          else {
+            p.vy = 0
+            p.resting = true
+          }
         }
       }
       draw()
 
-      // Settled on the floor → start pulling itself back together.
-      const settling = particles.every(
-        (p) => p.y >= h - p.size - 1 && Math.abs(p.vx) < 40 && Math.abs(p.vy) < 90
-      )
-      if (settling) setMode('return')
-    } else if (mode === 'return' || mode === 'assemble') {
+      if (landed) {
+        setMode('idle')
+        stop()
+        return
+      }
+    } else if (mode === 'drop') {
+      // Click: every letter lets go of the name and falls straight to the floor
+      // of the band, then the name gathers itself again.
+      let resting = true
+      for (const p of particles) {
+        if (p.resting) continue
+        resting = false
+        p.vy += GRAVITY * dt
+        p.x += p.vx * dt
+        p.y += p.vy * dt
+
+        const floor = h - p.size
+        if (p.y >= floor) {
+          p.y = floor
+          p.x = Math.min(Math.max(p.x, p.size / 2), w - p.size / 2)
+          if (Math.abs(p.vy) > 90) {
+            p.vy = -p.vy * RESTITUTION
+          } else {
+            p.vy = 0
+            p.vx *= 0.7
+            if (Math.abs(p.vx) < 8) {
+              p.vx = 0
+              p.resting = true
+            }
+          }
+        }
+      }
+      draw()
+
+      if (resting) {
+        playLand()
+        setMode('return')
+      }
+    } else if (mode === 'return') {
+      // Exponential ease home: snappy, frame-rate independent and overshoot-free,
+      // instead of the old spring that took seconds to settle.
+      const k = Math.min(1, dt * 11)
       let arrived = true
       for (const p of particles) {
         const dx = p.homeX - p.x
         const dy = p.homeY - p.y
-        if (Math.abs(dx) + Math.abs(dy) > 0.7) arrived = false
-        p.vx = (p.vx + dx * 90 * dt) * 0.86
-        p.vy = (p.vy + dy * 90 * dt) * 0.86
-        p.x += p.vx * dt
-        p.y += p.vy * dt
+        if (Math.abs(dx) + Math.abs(dy) > 0.5) arrived = false
+        p.x += dx * k
+        p.y += dy * k
+        p.vx = 0
+        p.vy = 0
+        p.s += (1 - p.s) * k
       }
       draw()
       if (arrived) {
         for (const p of particles) {
           p.x = p.homeX
           p.y = p.homeY
-          p.vx = 0
-          p.vy = 0
+          p.s = 1
         }
         draw()
         setMode('idle')
+        stop()
+        return
+      }
+    } else if (mode === 'bulge') {
+      const pointer = pointerRef.current
+      const k = Math.min(1, dt * 18)
+      let settled = true
+
+      for (const p of particles) {
+        let tx = p.homeX
+        let ty = p.homeY
+        let scale = 1
+
+        if (pointer.active) {
+          const dx = p.homeX - pointer.x
+          const dy = p.homeY - pointer.y
+          const dist = Math.hypot(dx, dy)
+          if (dist < BULGE_RADIUS && dist > 0.001) {
+            const t = 1 - dist / BULGE_RADIUS
+            const push = t * t * BULGE_STRENGTH
+            tx += (dx / dist) * push
+            ty += (dy / dist) * push
+            scale = 1 + t * 0.6
+          }
+        }
+
+        const ddx = tx - p.x
+        const ddy = ty - p.y
+        if (Math.abs(ddx) + Math.abs(ddy) > 0.35) settled = false
+        p.x += ddx * k
+        p.y += ddy * k
+        p.s += (scale - p.s) * k
+      }
+
+      draw()
+
+      if (settled) {
+        if (!pointer.active) {
+          for (const p of particles) {
+            p.x = p.homeX
+            p.y = p.homeY
+            p.s = 1
+          }
+          draw()
+          setMode('idle')
+        }
         stop()
         return
       }
@@ -150,8 +290,8 @@ export default function Nameplate() {
 
     const isLight = document.documentElement.getAttribute('data-theme') === 'light'
     colorsRef.current = {
-      base: isLight ? '28, 26, 46' : '247, 243, 234',
-      accent: isLight ? '180, 83, 9' : '251, 191, 36',
+      base: isLight ? '11, 11, 10' : '243, 238, 228',
+      accent: isLight ? '96, 90, 80' : '201, 192, 174',
     }
 
     const family =
@@ -188,6 +328,11 @@ export default function Nameplate() {
       }
     }
 
+    // Micro letters are sized off the sampling grid: large enough to close the
+    // gaps, tight enough that neighbouring letters do not muddy each other.
+    const cell = Math.max(7, Math.round(step * 1.55))
+    atlasRef.current = { cell, ...makeGlyphAtlas(cell, dpr, family, colorsRef.current) }
+
     // Thin the cloud down to budget without losing the silhouette.
     const stride = Math.max(1, Math.ceil(targets.length / MAX_PARTICLES))
     const particles = []
@@ -196,47 +341,56 @@ export default function Nameplate() {
       particles.push({
         homeX: t.x,
         homeY: t.y,
-        x: animateIn ? Math.random() * w : t.x,
-        y: animateIn ? Math.random() * h : t.y,
+        // Entrances start above the band and rain down into the name.
+        x: animateIn ? t.x + (Math.random() - 0.5) * cell * 2.4 : t.x,
+        y: animateIn ? -cell - Math.random() * h * 0.75 : t.y,
         vx: 0,
-        vy: 0,
+        vy: animateIn ? 120 + Math.random() * 300 : 0,
         size: Math.max(1.1, step * 0.62),
-        alpha: 0.55 + Math.random() * 0.45,
-        accent: Math.random() < 0.16,
+        // Even ink: a little variance keeps it from looking printed flat.
+        alpha: 0.9 + Math.random() * 0.1,
+        accent: false,
+        gi: (Math.random() * GLYPHS.length) | 0,
+        s: 1,
+        resting: !animateIn,
       })
     }
     particlesRef.current = particles
     canvas.dataset.particles = String(particles.length)
 
-    setMode(animateIn ? 'assemble' : 'idle')
-    if (animateIn) start()
-    else draw()
+    setMode(animateIn ? 'fall' : 'idle')
+    if (animateIn) {
+      playFall()
+      start()
+    } else {
+      draw()
+    }
   }, [draw, setMode, start])
 
-  // Burst every particle away from a point.
-  const burst = useCallback((ox, oy) => {
+  // Let the whole name go: every letter falls to the floor of the band.
+  const drop = useCallback(() => {
     if (reduceMotion()) return
     const particles = particlesRef.current
     if (!particles.length) return
+    pointerRef.current.active = false
 
     for (const p of particles) {
-      const dx = p.x - ox
-      const dy = p.y - oy
-      const dist = Math.hypot(dx, dy) || 1
-      const angle = Math.atan2(dy, dx) + (Math.random() - 0.5) * 0.9
-      const speed = 380 + Math.random() * 900
-      p.vx = Math.cos(angle) * speed + (dx / dist) * 120
-      p.vy = Math.sin(angle) * speed - 340 - Math.random() * 260
+      p.s = 1
+      p.resting = false
+      p.vx = (Math.random() - 0.5) * 70
+      // Staggered release speeds read as the letters giving way one by one.
+      p.vy = 40 + Math.random() * 380
     }
 
-    setMode('scatter')
+    setMode('drop')
+    playFall()
     start()
 
     // If it never fully settles, pull it home anyway.
     clearTimeout(resetTimerRef.current)
     resetTimerRef.current = window.setTimeout(() => {
-      if (modeRef.current === 'scatter') setMode('return')
-    }, 4000)
+      if (modeRef.current === 'drop') setMode('return')
+    }, 2400)
   }, [setMode, start])
 
   useEffect(() => {
@@ -269,15 +423,25 @@ export default function Nameplate() {
     }
   }, [build, stop])
 
-  const handlePointer = (e) => {
+  // Hover: whichever part of the name the cursor touches bulges outward around
+  // it, then the letters relax back into the name when the pointer leaves.
+  const handleHover = (e) => {
     const canvas = canvasRef.current
-    if (!canvas) return
+    if (!canvas || reduceMotion()) return
+    if (modeRef.current !== 'idle' && modeRef.current !== 'bulge') return
+
     const rect = canvas.getBoundingClientRect()
-    // Keyboard activation reports no coordinates — burst from the centre.
-    const isKeyboard = e.detail === 0
-    const x = isKeyboard ? rect.width / 2 : e.clientX - rect.left
-    const y = isKeyboard ? rect.height / 2 : e.clientY - rect.top
-    burst(x, y)
+    pointerRef.current.x = e.clientX - rect.left
+    pointerRef.current.y = e.clientY - rect.top
+    pointerRef.current.active = true
+
+    if (modeRef.current !== 'bulge') setMode('bulge')
+    start()
+  }
+
+  const handleLeave = () => {
+    pointerRef.current.active = false
+    if (modeRef.current === 'bulge') start()
   }
 
   return (
@@ -288,14 +452,16 @@ export default function Nameplate() {
         <button
           type="button"
           className="nameplate-btn"
-          onClick={handlePointer}
-          aria-label="Ayush Raj — click to scatter the name"
+          onMouseMove={handleHover}
+          onMouseLeave={handleLeave}
+          onClick={drop}
+          aria-label="Ayush Raj — hover to stir the letters, click to let the name fall"
         >
           <canvas ref={canvasRef} className="nameplate-canvas" aria-hidden="true" />
         </button>
 
         <span className="nameplate-hint" aria-hidden="true">
-          Click the name — it scatters, then sets itself again
+          Hover to bulge the letters — click and the name falls, then set itself again
         </span>
       </div>
     </section>
