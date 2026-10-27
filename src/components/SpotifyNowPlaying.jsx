@@ -1,67 +1,85 @@
 import { useState, useEffect } from 'react'
-import { fetchSpotifyPresence, subscribeSpotifyPresence, getLastPlayed, DEFAULT_DISCORD_ID } from '../services/spotify'
+import { FiClock } from 'react-icons/fi'
+import {
+  fetchSpotifyPresence,
+  subscribeSpotifyPresence,
+  getLastPlayed,
+  getPreviousTrack,
+  DEFAULT_DISCORD_ID,
+  HAS_SPOTIFY_APP_CREDS,
+  SPOTIFY_POLL_MS,
+} from '../services/spotify'
+
+function Equalizer() {
+  return (
+    <span className="sp-eq-mini active" aria-hidden="true">
+      <span /><span /><span />
+    </span>
+  )
+}
 
 export default function SpotifyNowPlaying() {
   const [data, setData] = useState(() => {
     // Seed from localStorage immediately so there's no blank flash
     const cached = getLastPlayed()
-    return cached ? { track: cached } : null
+    return cached ? { isLive: false, isLastPlayed: true, track: cached } : null
   })
+  const [previous, setPrevious] = useState(() => getPreviousTrack())
+  // null = follow the live state; 'last' pins the previously played track.
+  const [view, setView] = useState(null)
   const [loading, setLoading] = useState(true)
   const [embedTheme, setEmbedTheme] = useState(() =>
     typeof document !== 'undefined' && document.documentElement.getAttribute('data-theme') === 'dark' ? 1 : 0
   )
 
-  // Real-time WebSocket sync + 6s cache-busting REST fallback.
-  // Starts when the browser is idle so it never competes with first paint.
+  // Immediate first load, then a fast poll (paused while the tab is hidden) plus
+  // a refresh the moment the tab regains focus.
   useEffect(() => {
     let mounted = true
     let unsubscribe = null
     let iv = null
-    let idleId = null
+
+    const apply = (res) => {
+      if (!mounted || !res?.track) return
+      setData(res)
+      setPrevious(getPreviousTrack())
+      setLoading(false)
+    }
 
     const load = async () => {
       const res = await fetchSpotifyPresence(DEFAULT_DISCORD_ID)
-      if (mounted && res?.track) {
-        setData(res)
-        setLoading(false)
-      } else if (mounted && !res?.track) {
-        setLoading(false)
-      }
-    }
-
-    const start = () => {
       if (!mounted) return
-      load()
-
-      // Subscribe to Lanyard WebSocket for instant <100ms live track updates
-      unsubscribe = subscribeSpotifyPresence(DEFAULT_DISCORD_ID, (newData) => {
-        if (mounted && newData?.track) {
-          setData(newData)
-          setLoading(false)
-        }
-      })
-
-      // Fallback polling every 6s — paused while the tab is hidden
-      iv = setInterval(() => {
-        if (!document.hidden) load()
-      }, 6000)
+      if (res?.track) apply(res)
+      setLoading(false)
     }
 
-    if ('requestIdleCallback' in window) {
-      idleId = requestIdleCallback(start, { timeout: 2500 })
-    } else {
-      idleId = setTimeout(start, 1200)
+    load()
+
+    // Lanyard WebSocket for instant live track updates. With Spotify app
+    // credentials the REST poll is authoritative for live playback, so Lanyard's
+    // "not listening" pushes are ignored instead of overwriting the live song.
+    unsubscribe = subscribeSpotifyPresence(DEFAULT_DISCORD_ID, (next) => {
+      if (!next?.track) return
+      if (HAS_SPOTIFY_APP_CREDS && !next.isLive) return
+      apply(next)
+    })
+
+    iv = setInterval(() => {
+      if (!document.hidden) load()
+    }, SPOTIFY_POLL_MS)
+
+    const onWake = () => {
+      if (!document.hidden) load()
     }
+    document.addEventListener('visibilitychange', onWake)
+    window.addEventListener('focus', onWake)
 
     return () => {
       mounted = false
-      if (idleId !== null) {
-        if ('cancelIdleCallback' in window && typeof idleId === 'number') cancelIdleCallback(idleId)
-        else clearTimeout(idleId)
-      }
       if (unsubscribe) unsubscribe()
       if (iv) clearInterval(iv)
+      document.removeEventListener('visibilitychange', onWake)
+      window.removeEventListener('focus', onWake)
     }
   }, [])
 
@@ -75,15 +93,20 @@ export default function SpotifyNowPlaying() {
     return () => observer.disconnect()
   }, [])
 
-  const track = data?.track
+  const liveTrack = data?.isLive ? data.track : null
+  const lastTrack = data?.isLive ? previous : data?.track
+  const canSwitch = Boolean(
+    liveTrack && lastTrack && lastTrack.trackId && lastTrack.trackId !== liveTrack.trackId
+  )
+  const showLast = view === 'last' && canSwitch
+  const track = showLast ? lastTrack : data?.track
+  const showingLive = Boolean(data?.isLive && !showLast && track)
 
   // While loading AND no cached track to show, display skeleton
   if (loading && !track) {
     return (
       <div className="spotify-pill loading">
-        <div className="sp-eq-mini active">
-          <span /><span /><span />
-        </div>
+        <Equalizer />
         <span className="sp-loading-text">Connecting to Spotify…</span>
       </div>
     )
@@ -94,11 +117,52 @@ export default function SpotifyNowPlaying() {
 
   return (
     <div className="spotify-now-playing-wrapper">
+      <div className="spotify-card-head">
+        {canSwitch ? (
+          <div className="spotify-switch" role="tablist" aria-label="Spotify track">
+            <button
+              type="button"
+              role="tab"
+              aria-selected={!showLast}
+              className={`spotify-tab${showLast ? '' : ' active'}`}
+              onClick={() => setView('now')}
+            >
+              <Equalizer />
+              Now playing
+            </button>
+            <button
+              type="button"
+              role="tab"
+              aria-selected={showLast}
+              className={`spotify-tab${showLast ? ' active' : ''}`}
+              onClick={() => setView('last')}
+            >
+              <FiClock aria-hidden="true" />
+              Last listened
+            </button>
+          </div>
+        ) : (
+          <span className={`spotify-status${data?.isLive ? ' live' : ''}`}>
+            {data?.isLive ? (
+              <>
+                <Equalizer />
+                Now playing
+              </>
+            ) : (
+              <>
+                <FiClock aria-hidden="true" />
+                Last listened
+              </>
+            )}
+          </span>
+        )}
+      </div>
+
       <div className="spotify-embed-frame">
         <iframe
           className="spotify-embed"
-          title="Spotify player — now playing"
-          src={`https://open.spotify.com/embed/track/${track.trackId}?utm_source=generator&theme=${embedTheme}`}
+          title={showingLive ? 'Spotify player — now playing' : 'Spotify player — last listened'}
+          src={`https://open.spotify.com/embed/${track.kind === 'episode' ? 'episode' : 'track'}/${track.trackId}?utm_source=generator&theme=${embedTheme}`}
           width="100%"
           height="152"
           frameBorder="0"
