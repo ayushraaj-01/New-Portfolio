@@ -4,40 +4,40 @@ import { AnimatedSectionHeader } from './animations'
 
 const initialNodes = [
   // Core category nodes (Beige)
-  { id: 'Backend Core', label: 'Backend Core', color: '#f7f3ea', size: 20, isCore: true },
-  { id: 'Frontend Core', label: 'Frontend Core', color: '#f7f3ea', size: 20, isCore: true },
-  { id: 'Language Core', label: 'Language Core', color: '#f7f3ea', size: 20, isCore: true },
-  { id: 'Tooling Core', label: 'Tooling Core', color: '#f7f3ea', size: 20, isCore: true },
+  { id: 'Backend Core', label: 'Backend Core', color: 'var(--text-primary)', size: 20, isCore: true },
+  { id: 'Frontend Core', label: 'Frontend Core', color: 'var(--text-primary)', size: 20, isCore: true },
+  { id: 'Language Core', label: 'Language Core', color: 'var(--text-primary)', size: 20, isCore: true },
+  { id: 'Tooling Core', label: 'Tooling Core', color: 'var(--text-primary)', size: 20, isCore: true },
 
   // Backend (connected to Backend Core) -> Neon Lime
-  { id: 'Node.js', label: 'Node.js', color: '#fbbf24', size: 13 },
-  { id: 'Express', label: 'Express', color: '#fbbf24', size: 13 },
-  { id: 'MySQL', label: 'MySQL', color: '#fbbf24', size: 13 },
-  { id: 'MongoDB', label: 'MongoDB', color: '#fbbf24', size: 13 },
-  { id: 'REST APIs', label: 'REST APIs', color: '#fbbf24', size: 13 },
-  { id: 'JWT', label: 'JWT', color: '#fbbf24', size: 13 },
-  { id: 'Socket.io', label: 'Socket.io', color: '#fbbf24', size: 13 },
-  { id: 'Go', label: 'Go', color: '#fbbf24', size: 13 },
+  { id: 'Node.js', label: 'Node.js', color: 'var(--accent)', size: 13 },
+  { id: 'Express', label: 'Express', color: 'var(--accent)', size: 13 },
+  { id: 'MySQL', label: 'MySQL', color: 'var(--accent)', size: 13 },
+  { id: 'MongoDB', label: 'MongoDB', color: 'var(--accent)', size: 13 },
+  { id: 'REST APIs', label: 'REST APIs', color: 'var(--accent)', size: 13 },
+  { id: 'JWT', label: 'JWT', color: 'var(--accent)', size: 13 },
+  { id: 'Socket.io', label: 'Socket.io', color: 'var(--accent)', size: 13 },
+  { id: 'Go', label: 'Go', color: 'var(--accent)', size: 13 },
 
   // Frontend (connected to Frontend Core) -> Warm Beige
-  { id: 'React', label: 'React', color: '#e5d9c5', size: 13 },
-  { id: 'Next.js', label: 'Next.js', color: '#e5d9c5', size: 13 },
-  { id: 'Tailwind CSS', label: 'Tailwind CSS', color: '#e5d9c5', size: 13 },
-  { id: 'HTML/CSS', label: 'HTML/CSS', color: '#e5d9c5', size: 13 },
-  { id: 'JavaScript', label: 'JavaScript', color: '#e5d9c5', size: 13 },
+  { id: 'React', label: 'React', color: 'var(--text-secondary)', size: 13 },
+  { id: 'Next.js', label: 'Next.js', color: 'var(--text-secondary)', size: 13 },
+  { id: 'Tailwind CSS', label: 'Tailwind CSS', color: 'var(--text-secondary)', size: 13 },
+  { id: 'HTML/CSS', label: 'HTML/CSS', color: 'var(--text-secondary)', size: 13 },
+  { id: 'JavaScript', label: 'JavaScript', color: 'var(--text-secondary)', size: 13 },
 
   // Languages & Algorithms (connected to Language Core) -> Electric Lime
-  { id: 'Python', label: 'Python', color: '#fde68a', size: 13 },
-  { id: 'C', label: 'C', color: '#fde68a', size: 13 },
-  { id: 'C++', label: 'C++', color: '#fde68a', size: 13 },
-  { id: 'Java', label: 'Java', color: '#fde68a', size: 13 },
+  { id: 'Python', label: 'Python', color: 'var(--accent-deep)', size: 13 },
+  { id: 'C', label: 'C', color: 'var(--accent-deep)', size: 13 },
+  { id: 'C++', label: 'C++', color: 'var(--accent-deep)', size: 13 },
+  { id: 'Java', label: 'Java', color: 'var(--accent-deep)', size: 13 },
 
   // Tools & DevOps (connected to Tooling Core) -> Soft Muted Beige
-  { id: 'Git', label: 'Git', color: '#d4c5b2', size: 13 },
-  { id: 'Docker', label: 'Docker', color: '#d4c5b2', size: 13 },
-  { id: 'Vercel', label: 'Vercel', color: '#d4c5b2', size: 13 },
-  { id: 'Postman', label: 'Postman', color: '#d4c5b2', size: 13 },
-  { id: 'npm', label: 'npm', color: '#d4c5b2', size: 13 },
+  { id: 'Git', label: 'Git', color: 'var(--text-tertiary)', size: 13 },
+  { id: 'Docker', label: 'Docker', color: 'var(--text-tertiary)', size: 13 },
+  { id: 'Vercel', label: 'Vercel', color: 'var(--text-tertiary)', size: 13 },
+  { id: 'Postman', label: 'Postman', color: 'var(--text-tertiary)', size: 13 },
+  { id: 'npm', label: 'npm', color: 'var(--text-tertiary)', size: 13 },
 ]
 
 const initialLinks = [
