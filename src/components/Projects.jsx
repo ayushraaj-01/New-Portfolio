@@ -139,10 +139,12 @@ export default function Projects() {
                 transition: { duration: 0.35, ease: 'easeOut' }
               }}
             >
+              <div className="project-cover" aria-hidden="true">
+                <span className="project-cover-ghost">{project.number}</span>
+                <span className="project-cover-numeral">{project.number}</span>
+              </div>
+
               <div className="project-card-inner">
-                <div className="project-number">
-                  PROJECT {project.number}
-                </div>
                 <div>
                   <h3>{project.title}</h3>
                   <p>{project.description}</p>
