@@ -6,7 +6,6 @@ import {
   getLastPlayed,
   getPreviousTrack,
   DEFAULT_DISCORD_ID,
-  HAS_SPOTIFY_APP_CREDS,
   SPOTIFY_POLL_MS,
 } from '../services/spotify'
 
@@ -55,13 +54,19 @@ export default function SpotifyNowPlaying() {
 
     load()
 
-    // Lanyard WebSocket for instant live track updates. With Spotify app
-    // credentials the REST poll is authoritative for live playback, so Lanyard's
-    // "not listening" pushes are ignored instead of overwriting the live song.
+    // Lanyard WebSocket for instant live track updates.
+    // When playback is live, Lanyard's "not listening" pushes are ignored
+    // so an offline Discord status does not wipe out active playback.
     unsubscribe = subscribeSpotifyPresence(DEFAULT_DISCORD_ID, (next) => {
       if (!next?.track) return
-      if (HAS_SPOTIFY_APP_CREDS && !next.isLive) return
-      apply(next)
+      setData((current) => {
+        if (current?.isLive && !next.isLive) {
+          return current
+        }
+        setPrevious(getPreviousTrack())
+        setLoading(false)
+        return next
+      })
     })
 
     iv = setInterval(() => {

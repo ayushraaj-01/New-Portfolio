@@ -116,6 +116,43 @@ function toTrack(item) {
 }
 
 /**
+ * Fetches currently playing or recently played track from the serverless endpoint (/api/spotify).
+ * Works securely on Vercel as well as the Vite local dev server.
+ */
+let serverEndpointAvailable = true
+
+async function fetchServerSpotifyAPI() {
+  if (!serverEndpointAvailable) return null
+
+  try {
+    const res = await fetch('/api/spotify', {
+      cache: 'no-store',
+      headers: { 'Cache-Control': 'no-cache' },
+    })
+
+    if (res.status === 404) {
+      serverEndpointAvailable = false
+      return null
+    }
+
+    if (res.ok) {
+      const data = await res.json()
+      if (data && data.track) {
+        cacheLastPlayed(data.track)
+        return data
+      }
+      if (data && data.isLive === false && !data.track) {
+        const cached = getLastPlayed()
+        return { isLive: false, isLastPlayed: !!cached, track: cached || null }
+      }
+    }
+  } catch (_) {
+    // If serverless endpoint fails or network error, silently fall back
+  }
+  return null
+}
+
+/**
  * Fetches currently playing or recently played track directly from Spotify API servers 24/7.
  */
 async function fetchDirectSpotifyAPI() {
@@ -123,17 +160,21 @@ async function fetchDirectSpotifyAPI() {
     const accessToken = await getSpotifyAccessToken()
     if (!accessToken) return null
 
-    // 1. Query currently playing on Spotify
-    const nowRes = await fetch("https://api.spotify.com/v1/me/player/currently-playing", {
+    // 1. Query currently playing on Spotify (including podcast episodes)
+    const nowRes = await fetch("https://api.spotify.com/v1/me/player/currently-playing?additional_types=track,episode", {
       headers: { Authorization: `Bearer ${accessToken}` },
     })
 
     if (nowRes.status === 200) {
       const nowData = await nowRes.json()
-      if (nowData.is_playing && nowData.item) {
+      if (nowData && nowData.item) {
         const track = toTrack(nowData.item)
         cacheLastPlayed(track)
-        return { isLive: true, isLastPlayed: false, track }
+        return {
+          isLive: Boolean(nowData.is_playing),
+          isLastPlayed: !nowData.is_playing,
+          track,
+        }
       }
     }
 
@@ -144,7 +185,7 @@ async function fetchDirectSpotifyAPI() {
 
     if (recentRes.status === 200) {
       const recentData = await recentRes.json()
-      const item = recentData.items[0]?.track
+      const item = recentData.items?.[0]?.track
       if (item) {
         const track = toTrack(item)
         cacheLastPlayed(track)
@@ -158,14 +199,18 @@ async function fetchDirectSpotifyAPI() {
 }
 
 /**
- * Fetches current Spotify track via Direct Spotify API or Lanyard.
+ * Fetches current Spotify track via Serverless API, Direct Spotify API, or Lanyard.
  */
 export async function fetchSpotifyPresence(discordId = DEFAULT_DISCORD_ID) {
-  // 1. Direct Spotify Web API check (24/7 without Discord)
-  const directData = await fetchDirectSpotifyAPI()
-  if (directData) return directData
+  // 1. Serverless /api/spotify check (most secure, works on Vercel and local Vite dev)
+  const serverData = await fetchServerSpotifyAPI()
+  if (serverData && serverData.track) return serverData
 
-  // 2. Lanyard API Fallback
+  // 2. Direct Spotify Web API check (if client-side credentials exist)
+  const directData = await fetchDirectSpotifyAPI()
+  if (directData && directData.track) return directData
+
+  // 3. Lanyard API Fallback (Discord)
   if (!discordId) {
     const cached = getLastPlayed()
     return { isLive: false, isLastPlayed: !!cached, track: cached || null }
@@ -188,6 +233,7 @@ export async function fetchSpotifyPresence(discordId = DEFAULT_DISCORD_ID) {
         albumArt: s.album_art_url,
         spotifyUrl: `https://open.spotify.com/track/${s.track_id}`,
         trackId: s.track_id,
+        kind: 'track',
       }
       cacheLastPlayed(track)
       return { isLive: true, isLastPlayed: false, track }
