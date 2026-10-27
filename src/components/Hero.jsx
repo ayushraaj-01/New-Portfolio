@@ -139,7 +139,7 @@ export default function Hero() {
     // Colors matching theme
     const getAccentColor = () => {
       const theme = document.documentElement.getAttribute('data-theme')
-      return theme === 'light' ? 'rgba(180, 83, 9, ' : 'rgba(251, 191, 36, '
+      return theme === 'light' ? 'rgba(11, 11, 10, ' : 'rgba(243, 238, 228, '
     }
 
     class Particle {
