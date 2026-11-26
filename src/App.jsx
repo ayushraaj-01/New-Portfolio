@@ -1,11 +1,11 @@
-import { useState, useEffect, lazy, Suspense } from 'react'
+import { useState, useEffect, useCallback, lazy, Suspense } from 'react'
 import { motion, useScroll, useSpring } from 'framer-motion'
 import Navbar from './components/Navbar'
 import Hero from './components/Hero'
 import CursorDot from './components/CursorDot'
 import BackToTop from './components/BackToTop'
 import { SectionDivider } from './components/animations'
-import CameraLoader from './components/CameraLoader'
+import HandsLoader from './components/HandsLoader'
 import Nameplate from './components/Nameplate'
 
 // Below-the-fold sections are code-split so the first paint only ships the hero.
@@ -33,6 +33,10 @@ function App() {
   const [showSurprise, setShowSurprise] = useState(false)
   const [loading, setLoading] = useState(true)
 
+  const handleLoaderComplete = useCallback(() => {
+    setLoading(false)
+  }, [])
+
   // Prevent scroll during loading phase & restore scroll position after loader
   useEffect(() => {
     if (loading) {
@@ -41,7 +45,7 @@ function App() {
     } else {
       document.body.style.overflow = ''
       document.documentElement.style.overflow = ''
-      // Restore scroll position after camera loader completes
+      // Restore scroll position after hands loader completes
       const savedY = sessionStorage.getItem('portfolio_scroll_y')
       if (savedY) {
         const targetY = parseFloat(savedY)
@@ -209,7 +213,7 @@ function App() {
 
   return (
     <>
-      {loading && <CameraLoader onComplete={() => setLoading(false)} />}
+      {loading && <HandsLoader onComplete={handleLoaderComplete} />}
       <CursorDot />
       <BackToTop />
 
